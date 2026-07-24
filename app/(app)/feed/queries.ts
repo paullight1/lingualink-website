@@ -11,7 +11,8 @@ import {
 import type { LiveStreamRow } from "./types";
 
 const PROFILE_JOIN = "*, profiles:user_id(*)";
-const PAGE_LIMIT = 24;
+/** Matches the mobile feed's per-type limit so both clients show the same window. */
+const PAGE_LIMIT = 30;
 
 const EMPTY_VIEWER: ViewerContext = {
   likedIds: new Set(),
