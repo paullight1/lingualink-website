@@ -26,6 +26,40 @@ export function extractOriginalPrompt(phrase: string): string {
   return phrase;
 }
 
+import type { ValidationQuality } from "@/lib/types";
+
+export type { ValidationQuality };
+
+export interface QualityOption {
+  value: ValidationQuality;
+  label: string;
+  description: string;
+  /** Only `incorrect` counts as a rejection; `needs_work` still approves. */
+  isApproved: boolean;
+}
+
+/** Mirrors the mobile EnhancedValidationButtons options, in the same order. */
+export const QUALITY_OPTIONS: QualityOption[] = [
+  {
+    value: "excellent",
+    label: "Excellent",
+    description: "Perfect pronunciation & grammar",
+    isApproved: true,
+  },
+  {
+    value: "needs_work",
+    label: "Needs Work",
+    description: "Minor issues, but understandable",
+    isApproved: true,
+  },
+  {
+    value: "incorrect",
+    label: "Incorrect",
+    description: "Major errors or wrong language",
+    isApproved: false,
+  },
+];
+
 export interface FlagReason {
   id: "unclear_audio" | "dialect_dispute" | "inappropriate_content" | "other";
   label: string;

@@ -261,7 +261,12 @@ export interface ValidationQueueItem {
   validations_count: number;
 }
 
-export type ValidationQuality = "poor" | "fair" | "good" | "excellent";
+/**
+ * Grades accepted by POST /monetization/validate. Must stay identical to
+ * mobile `src/types/monetization.types.ts` — the backend validates against
+ * these exact strings.
+ */
+export type ValidationQuality = "excellent" | "needs_work" | "incorrect";
 
 /* ── Leaderboard ────────────────────────────────────────────────── */
 
