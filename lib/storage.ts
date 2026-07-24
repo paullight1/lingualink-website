@@ -95,3 +95,26 @@ export function uploadAvatar(userId: string, file: File) {
 export function publicUrl(bucket: string, path: string): string {
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl;
 }
+
+/**
+ * Recover the in-bucket object path from a stored public URL.
+ * Clips persist the full public URL in `audio_url` / `video_url`, but
+ * `storage.remove()` wants the path relative to the bucket, so deleting a row
+ * without this leaves the media orphaned in storage.
+ * Returns null when the URL doesn't belong to the given bucket.
+ */
+export function storagePathFromUrl(
+  bucket: string,
+  url: string | null | undefined
+): string | null {
+  if (!url) return null;
+  // Already a bare path.
+  if (!/^https?:\/\//i.test(url)) return url;
+
+  const marker = `/storage/v1/object/public/${bucket}/`;
+  const index = url.indexOf(marker);
+  if (index === -1) return null;
+
+  const path = url.slice(index + marker.length).split("?")[0];
+  return path ? decodeURIComponent(path) : null;
+}

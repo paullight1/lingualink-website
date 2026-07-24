@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { supabase } from "@/lib/supabase/client";
 import { qk } from "@/lib/query/keys";
 import { BUCKETS } from "@/lib/config";
+import { storagePathFromUrl } from "@/lib/storage";
 import type { VoiceClipRow, VideoClipRow, StoryRow } from "@/lib/types";
 
 /**
@@ -83,11 +84,12 @@ export function useDeleteVoiceClip(userId: string | null) {
         .eq("user_id", userId);
       if (error) throw error;
 
-      // Best-effort storage cleanup — only when audio_url looks like a bucket
-      // path rather than a full public URL (mirrors the mobile app's logic).
-      if (clip.audio_url && !/^https?:\/\//i.test(clip.audio_url)) {
+      // Best-effort storage cleanup. `audio_url` holds a full public URL, so
+      // the bucket-relative path has to be recovered before removing.
+      const path = storagePathFromUrl(BUCKETS.voiceClips, clip.audio_url);
+      if (path) {
         try {
-          await supabase.storage.from(BUCKETS.voiceClips).remove([clip.audio_url]);
+          await supabase.storage.from(BUCKETS.voiceClips).remove([path]);
         } catch {
           // ignore — the DB row is already gone, cleanup is best-effort
         }
