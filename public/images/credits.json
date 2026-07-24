@@ -1,0 +1,62 @@
+[
+  {
+    "file": "hero.jpg",
+    "description": "woman wearing white top",
+    "photographer": "Nick Owuor (astro.nic.portraits)",
+    "link": "https://unsplash.com/photos/woman-wearing-white-top-w640DEXkAP8"
+  },
+  {
+    "file": "record.jpg",
+    "description": "a person wearing headphones and holding a phone",
+    "photographer": "Akinyemi Gbadamosi",
+    "link": "https://unsplash.com/photos/a-person-wearing-headphones-and-holding-a-phone-nBiJoRbVHmA"
+  },
+  {
+    "file": "community.jpg",
+    "description": "woman in black dress sitting beside woman in green and yellow dress",
+    "photographer": "Andra C Taylor Jr",
+    "link": "https://unsplash.com/photos/woman-in-black-dress-sitting-beside-woman-in-green-and-yellow-dress-KfoNVMCFb5M"
+  },
+  {
+    "file": "earn.jpg",
+    "description": "Man in sunglasses talks on phone at outdoor cafe.",
+    "photographer": "Faustina Okeke",
+    "link": "https://unsplash.com/photos/man-in-sunglasses-talks-on-phone-at-outdoor-cafe-LYfMoZvhCg4"
+  },
+  {
+    "file": "about-hero.jpg",
+    "description": "man in red jacket and blue denim jeans standing beside yellow car during daytime",
+    "photographer": "Ayoola Salako",
+    "link": "https://unsplash.com/photos/man-in-red-jacket-and-blue-denim-jeans-standing-beside-yellow-car-during-daytime-xBzQWdpfDEU"
+  },
+  {
+    "file": "about-people.jpg",
+    "description": "family playing board games",
+    "photographer": "National Cancer Institute",
+    "link": "https://unsplash.com/photos/family-playing-board-games-VJVsEnR_vNE"
+  },
+  {
+    "file": "blog-culture.jpg",
+    "description": "assorted-color textiles",
+    "photographer": "Eva Blue",
+    "link": "https://unsplash.com/photos/assorted-color-textiles-SfPOkp6-2eA"
+  },
+  {
+    "file": "blog-audio.jpg",
+    "description": "macro photography of silver and black studio microphone condenser",
+    "photographer": "Jonathan Velasquez",
+    "link": "https://unsplash.com/photos/macro-photography-of-silver-and-black-studio-microphone-condenser-c1ZN57GfDB0"
+  },
+  {
+    "file": "blog-learning.jpg",
+    "description": "a woman standing in front of a group of children",
+    "photographer": "Emmanuel Ikwuegbu",
+    "link": "https://unsplash.com/photos/a-woman-standing-in-front-of-a-group-of-children-VC6MGt9ZoBA"
+  },
+  {
+    "file": "blog-earn.jpg",
+    "description": "assorted banknotes on orange surface",
+    "photographer": "Annie Spratt",
+    "link": "https://unsplash.com/photos/assorted-banknotes-on-orange-surface-KwxNBjdQae0"
+  }
+]

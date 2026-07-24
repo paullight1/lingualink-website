@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+/*
+  LinguaLink marketing site tokens.
+  One accent (brand orange), warm near-black ink, white base with a subtle
+  orange-tinted section shade. Radius rule: cards 16px, interactive pills full.
+*/
+@theme {
+  --color-bg: #ffffff;
+  --color-tint: #fff6ec;
+  --color-tint-deep: #ffe9d2;
+  --color-ink: #221b14;
+  --color-ink-soft: #5f564b;
+  --color-line: #ece2d6;
+  --color-brand: #ff8a00;
+  --color-brand-deep: #ff5f00;
+  --color-brand-text: #b0470a;
+  --color-night: #1d150e;
+  --color-night-soft: #cdbfae;
+  --color-night-line: #3a2f24;
+
+  --font-sans: var(--font-bricolage), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+
+  --radius-card: 16px;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--color-brand);
+  color: var(--color-ink);
+}
+
+/*
+  Motion. Content is fully visible by default; animation is an enhancement.
+  - .rise: entrance for above-the-fold hero elements (time-based, CSS only).
+  - .reveal: scroll-in for below-the-fold sections, only where the browser
+    supports scroll-driven animations. No JS, nothing gated on it.
+*/
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .rise {
+    animation: rise-in 0.7s var(--ease-out-quint) both;
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 45%;
+    }
+  }
+}
+
+/* Marquee for the language strip. Pauses under reduced motion. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-track {
+  animation: marquee 36s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}
+
+/* FAQ accordion chevron rotation */
+details[open] .faq-chevron {
+  transform: rotate(180deg);
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Focus visibility, consistent across the site */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--color-brand-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
