@@ -1,0 +1,20 @@
+/** Barrel export for the shared UI kit. Feature agents import from "@/components/ui". */
+export { GlassCard } from "./GlassCard";
+export type { GlassCardProps } from "./GlassCard";
+export { PrimaryButton } from "./PrimaryButton";
+export type { PrimaryButtonProps } from "./PrimaryButton";
+export { UserAvatar } from "./UserAvatar";
+export type { UserAvatarProps } from "./UserAvatar";
+export { AppHeader } from "./AppHeader";
+export type { AppHeaderProps } from "./AppHeader";
+export { SegmentedTabs } from "./SegmentedTabs";
+export type { SegmentedTab, SegmentedTabsProps } from "./SegmentedTabs";
+export { Chip } from "./Chip";
+export type { ChipProps } from "./Chip";
+export { WaveformPlayer } from "./WaveformPlayer";
+export type { WaveformPlayerProps } from "./WaveformPlayer";
+export { StatRow } from "./StatRow";
+export type { Stat } from "./StatRow";
+export { EmptyState } from "./EmptyState";
+export { Skeleton, Spinner } from "./Skeleton";
+export { SettingsSection, SettingsItem } from "./SettingsItem";

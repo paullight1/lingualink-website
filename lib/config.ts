@@ -1,0 +1,28 @@
+/**
+ * Centralized configuration. Reads NEXT_PUBLIC_* env vars (browser-safe).
+ */
+
+export const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://lingualink-backend-otu6.onrender.com/api/v1";
+
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+export const SUPABASE_ANON_KEY = process.env
+  .NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+
+export const APP_NAME = "LinguaLink";
+export const APP_VERSION = "1.0.0";
+
+/** Clerk JWT template that both Supabase (RLS) and the NestJS API validate. */
+export const CLERK_SUPABASE_TEMPLATE = "supabase";
+
+export const DEFAULT_AVATAR =
+  "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-image-182145777.jpg";
+
+/** Storage buckets (mirrors mobile app). */
+export const BUCKETS = {
+  voiceClips: "voice-clips",
+  videos: "videos",
+  stories: "stories",
+  avatars: "avatars",
+} as const;

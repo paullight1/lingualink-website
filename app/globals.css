@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+/*
+ * LinguaLink design tokens — ported from the mobile app's
+ * src/constants/Theme.ts. Theme-aware: dark is the hero theme.
+ * The `.dark` class on <html> toggles the palette.
+ */
+
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Brand */
+  --color-primary: #ff8a00;
+  --color-primary-dark: #ff5f00;
+
+  /* Category accents (icon chips / tags) */
+  --color-accent-purple: #8b5cf6;
+  --color-accent-blue: #3b82f6;
+  --color-accent-green: #10b981;
+  --color-accent-amber: #f59e0b;
+
+  /* Semantic tokens — resolve to the CSS vars set per-theme below */
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-2: var(--muted-2);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --color-input: var(--input);
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+
+  /* Radius (Theme.ts Layout.radius) */
+  --radius-s: 8px;
+  --radius-m: 16px;
+  --radius-l: 24px;
+  --radius-xl: 32px;
+
+  /* Spacing (Theme.ts Spacing) — extends the default scale */
+  --spacing-xs: 4px;
+  --spacing-s: 8px;
+  --spacing-m: 16px;
+  --spacing-l: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* Brand gradient + glow */
+  --shadow-glow: 0 8px 24px rgba(255, 138, 0, 0.3);
+}
+
+/* Light theme (default) */
+:root {
+  --background: #f8f9fa;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --foreground: #1f2937;
+  --muted: #6b7280;
+  --muted-2: rgba(0, 0, 0, 0.4);
+  --border: #e5e7eb;
+  --border-light: rgba(0, 0, 0, 0.1);
+  --input: #f3f4f6;
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --page-gradient: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+
+  color-scheme: light;
+}
+
+/* Dark theme (hero) */
+.dark {
+  --background: #1a0800;
+  --surface: #220a00;
+  --card: #2a0c00;
+  --foreground: #ffffff;
+  --muted: #cccccc;
+  --muted-2: rgba(255, 255, 255, 0.5);
+  --border: #2a0c00;
+  --border-light: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.08);
+  --success: #30d158;
+  --error: #ff453a;
+  --warning: #ffd60a;
+
+  --glass-bg: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --page-gradient: radial-gradient(120% 120% at 50% 0%, #1f0802 0%, #0d0200 100%);
+
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+
+  body {
+    background: var(--page-gradient);
+    background-attachment: fixed;
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+  }
+
+  /* Prevent horizontal scroll on mobile */
+  html {
+    overflow-x: hidden;
+  }
+
+  /* Thin, brand-tinted scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 9999px;
+  }
+}
+
+@layer utilities {
+  .bg-brand-gradient {
+    background-image: linear-gradient(90deg, #ff8a00 0%, #ff5f00 100%);
+  }
+  .text-brand-gradient {
+    background-image: linear-gradient(90deg, #ff8a00 0%, #ff5f00 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .glass {
+    background-color: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  /* Hide element until framer-motion / hydration kicks in — optional */
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
