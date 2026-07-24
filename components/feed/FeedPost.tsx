@@ -15,6 +15,7 @@ import {
 import toast from "react-hot-toast";
 import { GlassCard, UserAvatar, WaveformPlayer } from "@/components/ui";
 import { VoiceClipInteractions } from "./VoiceClipInteractions";
+import { ReportModal } from "@/components/moderation/ReportModal";
 import { supabase } from "@/lib/supabase/client";
 import { cn, formatDuration } from "@/lib/utils";
 import type { Post } from "@/lib/types";
@@ -44,6 +45,7 @@ export function FeedPost({ post, currentUserId, onOpenProfile }: FeedPostProps) 
   const [followBusy, setFollowBusy] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const isSelf = !!currentUserId && currentUserId === post.user.id;
 
@@ -121,7 +123,11 @@ export function FeedPost({ post, currentUserId, onOpenProfile }: FeedPostProps) 
 
   const handleReport = () => {
     setMenuOpen(false);
-    toast.success("Thanks — we'll take a look");
+    if (!currentUserId) {
+      toast.error("Sign in to report content");
+      return;
+    }
+    setReportOpen(true);
   };
 
   return (
@@ -324,6 +330,14 @@ export function FeedPost({ post, currentUserId, onOpenProfile }: FeedPostProps) 
           )}
         </Link>
       </div>
+
+      <ReportModal
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        reportedUserId={post.user.id}
+        postId={post.id}
+        title="Report post"
+      />
     </GlassCard>
   );
 }
