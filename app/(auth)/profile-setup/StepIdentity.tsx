@@ -2,38 +2,11 @@
 
 import { useRef, useState } from "react";
 import { Camera, Loader2, MapPin, Map, User } from "lucide-react";
-import { GlassCard } from "@/components/ui";
+import { Field, Input } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { uploadAvatar } from "@/lib/storage";
 import { AVATAR_SEEDS, dicebearUrl } from "./country-data";
 import toast from "react-hot-toast";
-
-function InputGroup({
-  label,
-  icon: Icon,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
-  icon: React.ElementType;
-}) {
-  return (
-    <div className="space-y-2">
-      <label className="ml-1 block text-sm font-semibold tracking-wide text-[var(--muted)]">
-        {label}
-      </label>
-      <GlassCard intensity={15} className="rounded-[20px]">
-        <div className="flex h-16 items-center gap-3 px-4">
-          <Icon className="h-5 w-5 shrink-0 text-[var(--color-primary)]" />
-          <input
-            autoCapitalize="none"
-            className="h-full w-full bg-transparent text-[17px] font-medium text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
-            {...props}
-          />
-        </div>
-      </GlassCard>
-    </div>
-  );
-}
 
 /** Step 2 — username/state/city + avatar (upload or DiceBear cartoon pick). */
 export function StepIdentity({
@@ -79,49 +52,64 @@ export function StepIdentity({
 
   return (
     <div>
-      <h1 className="text-[32px] font-extrabold leading-tight tracking-tight text-[var(--foreground)] sm:text-[34px]">
-        Your <span className="text-[var(--color-primary)]">Identity</span>
+      <h1 className="text-[28px] font-extrabold leading-tight tracking-tight text-[var(--foreground)] sm:text-[32px]">
+        Your <span className="text-brand-gradient">Identity</span>
       </h1>
-      <p className="mb-8 mt-2 text-base text-[var(--muted)]">
+      <p className="mb-8 mt-2 text-[15px] leading-snug text-[var(--muted)]">
         How should the community recognize you?
       </p>
 
-      <div className="space-y-6">
-        <InputGroup
-          label="Username"
-          icon={User}
-          placeholder="e.g. tunde_heritage"
-          value={username}
-          onChange={(e) => onUsernameChange(e.target.value)}
-        />
-        <InputGroup
-          label="State / Region"
-          icon={Map}
-          placeholder="e.g. Lagos"
-          value={state}
-          onChange={(e) => onStateChange(e.target.value)}
-        />
-        <InputGroup
-          label="Town / City (optional)"
-          icon={MapPin}
-          placeholder="e.g. Ikeja"
-          value={city}
-          onChange={(e) => onCityChange(e.target.value)}
-        />
+      <div className="flex flex-col gap-5">
+        <Field label="Username" hint="Letters, numbers and underscores. At least 3 characters.">
+          <Input
+            variant="glass"
+            icon={User}
+            placeholder="tunde_heritage"
+            autoCapitalize="none"
+            autoCorrect="off"
+            autoComplete="username"
+            value={username}
+            onChange={(e) => onUsernameChange(e.target.value)}
+          />
+        </Field>
+        <Field label="State / Region">
+          <Input
+            variant="glass"
+            icon={Map}
+            placeholder="Lagos"
+            autoComplete="address-level1"
+            value={state}
+            onChange={(e) => onStateChange(e.target.value)}
+          />
+        </Field>
+        <Field label="Town / City" optional>
+          <Input
+            variant="glass"
+            icon={MapPin}
+            placeholder="Ikeja"
+            autoComplete="address-level2"
+            value={city}
+            onChange={(e) => onCityChange(e.target.value)}
+          />
+        </Field>
       </div>
 
       <div className="mt-10">
-        <label className="mb-3 block text-sm font-semibold tracking-wide text-[var(--muted)]">
+        <p className="mb-1 text-[13px] font-semibold text-[var(--foreground)]">
           Choose an avatar vibe
-        </label>
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        </p>
+        <p className="mb-3 text-[12px] text-[var(--muted-2)]">
+          Upload a photo or pick one of the cartoon avatars.
+        </p>
+        <div className="no-scrollbar -mx-1 flex gap-3.5 overflow-x-auto px-1 pb-2 pt-1">
           <button
             type="button"
             disabled={uploading}
+            aria-label="Upload a photo"
             onClick={() => fileInputRef.current?.click()}
             className={cn(
-              "relative flex h-[88px] w-[88px] shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-dashed transition disabled:opacity-70",
-              "border-[var(--color-primary)] bg-[var(--input)]"
+              "relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-dashed transition disabled:opacity-70",
+              "border-[var(--color-primary)] bg-[var(--input)] hover:bg-[var(--color-primary)]/10"
             )}
           >
             {isUploadedPhoto ? (
@@ -155,12 +143,15 @@ export function StepIdentity({
               <button
                 type="button"
                 key={seed}
+                aria-label={`Avatar ${seed}`}
+                aria-pressed={selected}
                 onClick={() => onAvatarChange(url)}
                 className={cn(
-                  "h-[88px] w-[88px] shrink-0 overflow-hidden rounded-full border bg-[var(--input)] transition",
-                  selected
-                    ? "border-2 border-[var(--color-primary)]"
-                    : "border-[var(--border-light)]"
+                  // ring rather than a border swap — a 1px→2px border would
+                  // nudge the image and jitter the row on selection.
+                  "h-20 w-20 shrink-0 overflow-hidden rounded-full bg-[var(--input)] ring-1 ring-[var(--border-light)] transition hover:ring-[var(--muted-2)]",
+                  selected &&
+                    "ring-2 ring-[var(--color-primary)] ring-offset-2 ring-offset-[var(--background)] hover:ring-[var(--color-primary)]"
                 )}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}

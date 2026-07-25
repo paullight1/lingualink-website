@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronRight, ArrowLeft } from "lucide-react";
 import toast from "react-hot-toast";
-import { PrimaryButton, Spinner, EmptyState } from "@/components/ui";
+import { PrimaryButton, Spinner, EmptyState, StepProgress } from "@/components/ui";
 import { supabase } from "@/lib/supabase/client";
 import {
   useCurrentUserId,
@@ -129,24 +129,18 @@ export default function InterestsPage() {
         </p>
       </div>
 
-      {/* Progress bar */}
-      <div className="mb-6 flex flex-col items-center gap-1.5 px-1">
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--glass-bg)]">
-          <div
-            className="h-full rounded-full bg-[var(--color-primary)] transition-all duration-500"
-            style={{ width: `${(step / 2) * 100}%` }}
-          />
-        </div>
-        <span className="text-[11px] font-bold tracking-[1.5px] text-[var(--muted)]">
-          STEP {step} OF 2
-        </span>
-      </div>
+      <StepProgress step={step} total={2} className="mb-6" />
 
       {step === 1 ? (
         <div>
-          <h2 className="mb-4 text-lg font-bold tracking-tight text-[var(--foreground)]">
-            Select up to 3 interests
-          </h2>
+          <div className="mb-4 flex items-baseline justify-between gap-3">
+            <h2 className="text-[17px] font-bold tracking-tight text-[var(--foreground)]">
+              Select up to 3 interests
+            </h2>
+            <span className="shrink-0 text-[12px] font-semibold tabular-nums text-[var(--muted-2)]">
+              {selected.length}/{MAX_INTERESTS}
+            </span>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             {INTERESTS.map((interest) => (
               <InterestCard
@@ -168,7 +162,7 @@ export default function InterestsPage() {
             <ArrowLeft className="h-4 w-4" />
             Back
           </button>
-          <h2 className="mb-4 text-lg font-bold tracking-tight text-[var(--foreground)]">
+          <h2 className="mb-4 text-[17px] font-bold tracking-tight text-[var(--foreground)]">
             Recommended for you
           </h2>
 

@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Search, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { X } from "lucide-react";
+import { SearchInput } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import type { Country } from "./country-data";
 
@@ -27,47 +28,61 @@ export function CountryModal({
     return countries.filter((c) => c.name.toLowerCase().includes(q));
   }, [countries, query]);
 
+  // Esc closes, and the page behind must not scroll while the sheet is open.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previous;
+    };
+  }, [open, onClose]);
+
   if (!open) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
     >
       <div
-        className="flex max-h-[80vh] w-full max-w-md flex-col overflow-hidden rounded-t-[24px] border border-[var(--border-light)] bg-[var(--card)] sm:rounded-[24px]"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Select country"
+        className="flex max-h-[85dvh] w-full max-w-md flex-col overflow-hidden rounded-t-[24px] border border-[var(--border-light)] bg-[var(--card)] shadow-2xl sm:rounded-[24px]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-[var(--border-light)] px-5 py-4">
-          <h2 className="text-lg font-bold text-[var(--foreground)]">
+        <div className="flex items-center justify-between gap-3 border-b border-[var(--border-light)] px-5 py-4">
+          <h2 className="text-[17px] font-bold text-[var(--foreground)]">
             Select Country
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="rounded-full p-1.5 text-[var(--muted)] transition hover:bg-[var(--input)] hover:text-[var(--foreground)]"
+            className="-mr-1.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--muted)] transition hover:bg-[var(--input)] hover:text-[var(--foreground)]"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="px-5 pt-4">
-          <div className="flex items-center gap-2 rounded-full border border-[var(--border-light)] bg-[var(--input)] px-4 py-2.5">
-            <Search className="h-4 w-4 shrink-0 text-[var(--muted)]" />
-            <input
-              autoFocus
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search countries..."
-              className="w-full bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
-            />
-          </div>
+          <SearchInput
+            autoFocus
+            label="Search countries"
+            placeholder="Search countries…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onClear={() => setQuery("")}
+          />
         </div>
 
-        <ul className="mt-2 flex-1 overflow-y-auto px-2 pb-4">
+        <ul className="mt-3 flex-1 overflow-y-auto px-2 pb-4">
           {filtered.length === 0 && (
-            <li className="px-4 py-8 text-center text-sm text-[var(--muted)]">
+            <li className="px-4 py-10 text-center text-sm text-[var(--muted)]">
               No countries match “{query}”.
             </li>
           )}
@@ -78,17 +93,25 @@ export function CountryModal({
                 <button
                   type="button"
                   onClick={() => onSelect(c)}
+                  aria-pressed={isSelected}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-[var(--input)]",
-                    isSelected && "bg-[var(--input)]"
+                    "flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition hover:bg-[var(--input)]",
+                    isSelected && "bg-[var(--color-primary)]/10"
                   )}
                 >
                   <span className="text-2xl leading-none">{c.flag}</span>
-                  <span className="flex flex-col">
-                    <span className="text-[15px] font-semibold text-[var(--foreground)]">
+                  <span className="flex min-w-0 flex-col">
+                    <span
+                      className={cn(
+                        "truncate text-[15px] font-semibold",
+                        isSelected
+                          ? "text-[var(--color-primary)]"
+                          : "text-[var(--foreground)]"
+                      )}
+                    >
                       {c.name}
                     </span>
-                    <span className="text-xs text-[var(--muted)]">
+                    <span className="text-[12px] text-[var(--muted-2)]">
                       {c.languages.length} languages
                     </span>
                   </span>

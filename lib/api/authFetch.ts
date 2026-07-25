@@ -14,12 +14,42 @@ interface AuthFetchOptions extends RequestInit {
 let _getClerkToken: (() => Promise<string | null>) | null = null;
 let _clerkUserId: string | null = null;
 
+/*
+ * Calls can fire before Clerk has finished loading — React runs a parent
+ * provider's effects after its children's, so the first wave of page queries
+ * reaches authFetch before the provider has registered anything. Without this
+ * gate those calls threw "Authentication required" on a perfectly valid
+ * session. Requests now wait for auth to settle instead of failing the race.
+ */
+let _authSettled = false;
+let _resolveSettled: () => void;
+const _settledPromise = new Promise<void>((resolve) => {
+  _resolveSettled = resolve;
+});
+
+const AUTH_WAIT_MS = 10_000;
+
 export function setAuthTokenProvider(
-  getToken: () => Promise<string | null>,
+  getToken: (() => Promise<string | null>) | null,
   userId: string | null
 ) {
   _getClerkToken = getToken;
   _clerkUserId = userId;
+}
+
+/** Called once Clerk has loaded, whether or not anyone is signed in. */
+export function markAuthSettled() {
+  if (_authSettled) return;
+  _authSettled = true;
+  _resolveSettled();
+}
+
+async function waitForAuth(): Promise<void> {
+  if (_authSettled) return;
+  await Promise.race([
+    _settledPromise,
+    new Promise<void>((resolve) => setTimeout(resolve, AUTH_WAIT_MS)),
+  ]);
 }
 
 export async function authFetch(
@@ -30,6 +60,8 @@ export async function authFetch(
   const url = endpoint.startsWith("http")
     ? endpoint
     : `${API_BASE_URL}${endpoint}`;
+
+  if (requireAuth) await waitForAuth();
 
   let accessToken: string | null = null;
   if (_getClerkToken) {

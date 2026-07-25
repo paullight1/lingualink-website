@@ -8,7 +8,7 @@ import {
   mapVoiceClip,
   type ViewerContext,
 } from "./mappers";
-import type { LiveStreamRow } from "./types";
+import { getActiveStreams, type LiveStream } from "@/lib/api/live";
 
 const PROFILE_JOIN = "*, profiles:user_id(*)";
 /** Matches the mobile feed's per-type limit so both clients show the same window. */
@@ -182,23 +182,16 @@ export async function fetchFeedStories(): Promise<StoryRow[]> {
   return (data as StoryRow[] | null) ?? [];
 }
 
-/** Currently-live streams, if any. */
-export async function fetchLiveStreams(): Promise<LiveStreamRow[]> {
+/**
+ * Currently-live streams from the shared `/live/discover` endpoint — the same
+ * source the mobile app reads. (Querying `live_streams` directly is a trap:
+ * its owner column is `streamer_id`, not `user_id`.)
+ */
+export async function fetchLiveStreams(): Promise<LiveStream[]> {
   try {
-    const { data, error } = await supabase
-      .from("live_streams")
-      .select("*, profiles:user_id(*)")
-      .eq("is_live", true)
-      .order("created_at", { ascending: false })
-      .limit(20);
-
-    if (error) {
-      console.error("[feed] live_streams fetch failed", error);
-      return [];
-    }
-    return (data as LiveStreamRow[] | null) ?? [];
+    return await getActiveStreams();
   } catch (err) {
-    console.error("[feed] live_streams fetch threw", err);
+    console.error("[feed] live discovery failed", err);
     return [];
   }
 }

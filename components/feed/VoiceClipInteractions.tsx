@@ -15,6 +15,8 @@ export interface VoiceClipInteractionsProps {
   comments: number;
   isLiked: boolean;
   onLike: () => void;
+  /** Omitted for post types the `comments` table can't reference (video/story). */
+  onComment?: () => void;
 }
 
 function ActionButton({
@@ -56,6 +58,7 @@ export function VoiceClipInteractions({
   comments,
   isLiked,
   onLike,
+  onComment,
 }: VoiceClipInteractionsProps) {
   const handleShare = async () => {
     const url =
@@ -90,11 +93,14 @@ export function VoiceClipInteractions({
           />
         }
       />
-      <ActionButton
-        label="Comments"
-        count={comments}
-        icon={<MessageCircle className="h-[18px] w-[18px]" />}
-      />
+      {onComment && (
+        <ActionButton
+          label="Comments"
+          onClick={onComment}
+          count={comments}
+          icon={<MessageCircle className="h-[18px] w-[18px]" />}
+        />
+      )}
       <ActionButton
         onClick={handleShare}
         label="Share"

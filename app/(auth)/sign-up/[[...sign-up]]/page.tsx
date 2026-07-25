@@ -15,15 +15,19 @@ import {
   Mail,
   Lock,
   Gift,
-  Eye,
-  EyeOff,
   ArrowRight,
   Check,
   X,
   Loader2,
 } from "lucide-react";
-import { GlassCard, PrimaryButton } from "@/components/ui";
-import { cn, normalizeUsername } from "@/lib/utils";
+import {
+  Field,
+  GlassCard,
+  Input,
+  PasswordInput,
+  PrimaryButton,
+} from "@/components/ui";
+import { normalizeUsername } from "@/lib/utils";
 import { supabase } from "@/lib/supabase/client";
 
 type UsernameStatus = "idle" | "checking" | "available" | "taken" | "short";
@@ -77,7 +81,6 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [referralCode, setReferralCode] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const [fullNameError, setFullNameError] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -243,36 +246,41 @@ export default function SignUpPage() {
         </p>
 
         <form onSubmit={handleVerify} className="mt-8 flex flex-col gap-6">
-          <FieldGroup label="Verification code">
-            <input
+          <Field label="Verification code" hint="It can take a minute to arrive.">
+            <Input
+              variant="glass"
               value={code}
               onChange={(ev) => setCode(ev.target.value.replace(/\D/g, "").slice(0, 6))}
               inputMode="numeric"
               autoComplete="one-time-code"
+              autoFocus
+              maxLength={6}
               placeholder="123456"
-              className="w-full bg-transparent text-center text-lg tracking-[0.5em] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] placeholder:tracking-normal"
+              align="center"
+              className="text-[22px] font-bold tracking-[0.4em] placeholder:font-normal placeholder:tracking-[0.2em]"
             />
-          </FieldGroup>
+          </Field>
 
           <PrimaryButton type="submit" loading={verifying} rightIcon={<ArrowRight className="h-5 w-5" />}>
             {verifying ? "Verifying..." : "Verify & Continue"}
           </PrimaryButton>
 
-          <button
-            type="button"
-            onClick={handleResend}
-            className="text-center text-sm font-medium text-[var(--color-primary)] hover:brightness-110"
-          >
-            Resend code
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setStep("form")}
-            className="text-center text-sm text-[var(--muted)] hover:text-[var(--foreground)]"
-          >
-            Back to sign up
-          </button>
+          <div className="flex flex-col items-center gap-3">
+            <button
+              type="button"
+              onClick={handleResend}
+              className="text-sm font-semibold text-[var(--color-primary)] hover:brightness-110"
+            >
+              Resend code
+            </button>
+            <button
+              type="button"
+              onClick={() => setStep("form")}
+              className="text-sm text-[var(--muted)] hover:text-[var(--foreground)]"
+            >
+              Back to sign up
+            </button>
+          </div>
         </form>
       </div>
     );
@@ -287,84 +295,89 @@ export default function SignUpPage() {
         Join the community of language preservers.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-6">
-        <FieldGroup label="Full Name" error={fullNameError}>
-          <User className="h-5 w-5 shrink-0 text-[var(--muted)]" />
-          <input
+      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-5">
+        <Field label="Full name" error={fullNameError}>
+          <Input
+            variant="glass"
+            icon={User}
             value={fullName}
             onChange={(ev) => {
               setFullName(ev.target.value);
               setFullNameError("");
             }}
-            placeholder="John Doe"
+            placeholder="Tunde Adeyemi"
             autoComplete="name"
-            className="w-full bg-transparent text-center text-[15px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
           />
-        </FieldGroup>
+        </Field>
 
-        <FieldGroup label="Choose Handle" error={usernameError} statusIcon={<UsernameStatusIcon status={usernameStatus} />}>
-          <AtSign className="h-5 w-5 shrink-0 text-[var(--muted)]" />
-          <input
+        <Field
+          label="Choose a handle"
+          error={usernameError}
+          hint="This is how people will find and @mention you."
+        >
+          <Input
+            variant="glass"
+            icon={AtSign}
             value={username}
             onChange={(ev) => setUsername(ev.target.value)}
             placeholder="unique_username"
             autoCapitalize="none"
             autoCorrect="off"
             autoComplete="off"
-            className="w-full bg-transparent text-center text-[15px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+            spellCheck={false}
+            suffix={<UsernameStatusIcon status={usernameStatus} />}
           />
-        </FieldGroup>
+        </Field>
 
-        <FieldGroup label="Email Address" error={emailError}>
-          <Mail className="h-5 w-5 shrink-0 text-[var(--muted)]" />
-          <input
+        <Field label="Email address" error={emailError}>
+          <Input
+            variant="glass"
+            icon={Mail}
             value={email}
             onChange={(ev) => {
               setEmail(ev.target.value);
               setEmailError("");
             }}
             type="email"
+            inputMode="email"
             placeholder="name@example.com"
             autoComplete="email"
-            className="w-full bg-transparent text-center text-[15px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+            autoCapitalize="none"
           />
-        </FieldGroup>
+        </Field>
 
-        <FieldGroup label="Password" error={passwordError}>
-          <Lock className="h-5 w-5 shrink-0 text-[var(--muted)]" />
-          <input
+        <Field label="Password" error={passwordError}>
+          <PasswordInput
+            variant="glass"
+            icon={Lock}
             value={password}
             onChange={(ev) => {
               setPassword(ev.target.value);
               setPasswordError("");
             }}
-            type={showPassword ? "text" : "password"}
-            placeholder="Min. 6 characters"
+            placeholder="At least 6 characters"
             autoComplete="new-password"
-            className="w-full bg-transparent text-center text-[15px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
           />
-          <button
-            type="button"
-            onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            className="shrink-0 text-[var(--color-primary)]"
-          >
-            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-          </button>
-        </FieldGroup>
+        </Field>
 
-        <FieldGroup label="Referral Code (Optional)">
-          <Gift className="h-5 w-5 shrink-0 text-[var(--muted)]" />
-          <input
+        <Field label="Referral code" optional>
+          <Input
+            variant="glass"
+            icon={Gift}
             value={referralCode}
             onChange={(ev) => setReferralCode(ev.target.value)}
-            placeholder="e.g. @username"
+            placeholder="@username"
             autoCapitalize="none"
-            className="w-full bg-transparent text-center text-[15px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+            autoCorrect="off"
           />
-        </FieldGroup>
+        </Field>
 
-        <PrimaryButton type="submit" loading={submitting} rightIcon={<ArrowRight className="h-5 w-5" />}>
+        <PrimaryButton
+          className="mt-1"
+          type="submit"
+          loading={submitting}
+          rightIcon={<ArrowRight className="h-5 w-5" />}
+        >
           {submitting ? "Creating..." : "Create Account"}
         </PrimaryButton>
       </form>
@@ -404,45 +417,15 @@ export default function SignUpPage() {
   );
 }
 
-function FieldGroup({
-  label,
-  error,
-  statusIcon,
-  children,
-}: {
-  label: string;
-  error?: string;
-  statusIcon?: React.ReactNode;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-2.5">
-      <div className="flex items-center justify-center gap-2 px-1">
-        <span className="text-[13px] font-semibold text-[var(--muted)]">{label}</span>
-        {error ? <span className="text-[10px] text-[var(--error)]">{error}</span> : null}
-      </div>
-      <GlassCard
-        className={cn("h-16 rounded-[20px]", error && "border-[var(--error)]")}
-        intensity={30}
-      >
-        <div className="flex h-full w-full items-center gap-4 px-4">
-          {children}
-          {statusIcon}
-        </div>
-      </GlassCard>
-    </div>
-  );
-}
-
 function UsernameStatusIcon({ status }: { status: UsernameStatus }) {
   if (status === "checking") {
-    return <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[var(--muted)]" />;
+    return <Loader2 className="h-[18px] w-[18px] animate-spin text-[var(--muted-2)]" />;
   }
   if (status === "available") {
-    return <Check className="h-5 w-5 shrink-0 text-[var(--success)]" />;
+    return <Check className="h-[18px] w-[18px] text-[var(--success)]" />;
   }
   if (status === "taken") {
-    return <X className="h-5 w-5 shrink-0 text-[var(--error)]" />;
+    return <X className="h-[18px] w-[18px] text-[var(--error)]" />;
   }
   return null;
 }

@@ -79,14 +79,22 @@ export interface ProfileRow {
   state?: string | null;
   city?: string | null;
   location?: string | null;
-  xp?: number | null;
-  streak?: number | null;
   balance?: number | null;
+  pending_balance?: number | null;
   total_earned?: number | null;
   target_followers_count?: number | null;
   has_completed_onboarding?: boolean | null;
-  is_verified?: boolean | null;
   is_admin?: boolean | null;
+  is_ambassador?: boolean | null;
+  /** Dialects this user is verified in — the DB's notion of "verified". */
+  verified_dialects?: string[] | null;
+  /** Progression signals the DB actually exposes (there is no `xp`/`streak`). */
+  trust_score?: number | null;
+  validator_tier?: string | null;
+  validator_score?: number | null;
+  total_validations_count?: number | null;
+  role?: string | null;
+  user_role?: string | null;
   created_at?: string;
 }
 
@@ -110,10 +118,11 @@ export interface VoiceClipRow {
 export interface VideoClipRow {
   id: string;
   user_id: string;
+  /** Video clips carry `phrase`, not `caption` — there is no caption column. */
   phrase?: string | null;
-  caption?: string | null;
   translation?: string | null;
   language?: string | null;
+  dialect?: string | null;
   video_url: string;
   thumbnail_url?: string | null;
   duration?: number | null;
@@ -127,11 +136,10 @@ export interface StoryRow {
   id: string;
   user_id: string;
   media_url: string;
-  thumbnail_url?: string | null;
-  title?: string | null;
-  /** Mobile writes the story's text here and falls back to it for display. */
+  /** The story's text. There is no `title` or `thumbnail_url` column —
+   *  `media_url` doubles as the poster image. */
   caption?: string | null;
-  content_type?: string | null;
+  is_public?: boolean | null;
   created_at: string;
   expires_at?: string | null;
   profiles?: Partial<ProfileRow> | null;
@@ -233,6 +241,28 @@ export interface BadgeProgress {
   badgeId: string;
   current: number;
   target: number;
+}
+
+/* ── Banking / payouts (mirrors mobile monetization.types.ts) ───── */
+
+export interface BankItem {
+  name: string;
+  code: string;
+  slug: string;
+}
+
+export interface BankResolveResult {
+  accountNumber: string;
+  accountName: string;
+  bankCode: string;
+  bankName: string;
+}
+
+export interface LinkedBank {
+  bankName: string | null;
+  bankCode: string | null;
+  accountNumberLast4: string | null;
+  accountName: string | null;
 }
 
 /* ── Monetization ───────────────────────────────────────────────── */

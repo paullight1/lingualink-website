@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { X, Megaphone, AlertTriangle, EyeOff, MoreHorizontal } from "lucide-react";
+import { Megaphone, AlertTriangle, EyeOff, MoreHorizontal } from "lucide-react";
 import toast from "react-hot-toast";
-import { PrimaryButton } from "@/components/ui";
+import { Field, ModalSheet, PrimaryButton, Textarea } from "@/components/ui";
 import { cn } from "@/lib/utils";
 import { submitReport, REPORT_REASONS, type ReportReason } from "@/lib/api/moderation";
 
@@ -71,36 +71,23 @@ export function ReportModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center"
-      onClick={close}
-      role="presentation"
+    <ModalSheet
+      onClose={close}
+      title={title}
+      description="Why are you reporting this? Reports are anonymous."
+      size="md"
+      footer={
+        <PrimaryButton
+          variant="danger"
+          disabled={!reason || submitting}
+          loading={submitting}
+          onClick={handleSubmit}
+        >
+          Submit Report
+        </PrimaryButton>
+      }
     >
-      <div
-        className="flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-[24px] border border-[var(--border-light)] bg-[var(--card)] sm:rounded-[24px]"
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-      >
-        <div className="flex items-center justify-between border-b border-[var(--border-light)] px-5 py-4">
-          <h2 className="text-lg font-bold text-[var(--foreground)]">{title}</h2>
-          <button
-            type="button"
-            onClick={close}
-            aria-label="Close"
-            className="rounded-full p-1.5 text-[var(--muted)] transition hover:bg-[var(--input)] hover:text-[var(--foreground)]"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-5 py-4">
-          <p className="mb-4 text-sm text-[var(--muted)]">
-            Why are you reporting this? Reports are anonymous.
-          </p>
-
-          <div className="flex flex-col gap-2">
+      <div role="radiogroup" aria-label="Reason" className="flex flex-col gap-2">
             {REPORT_REASONS.map((option) => {
               const Icon = REASON_ICONS[option.value];
               const selected = reason === option.value;
@@ -108,22 +95,37 @@ export function ReportModal({
                 <button
                   key={option.value}
                   type="button"
+                  role="radio"
                   onClick={() => setReason(option.value)}
-                  aria-pressed={selected}
+                  aria-checked={selected}
                   className={cn(
-                    "flex items-start gap-3 rounded-2xl border px-4 py-3 text-left transition",
+                    "flex items-start gap-3 rounded-[16px] border px-4 py-3 text-left transition",
                     selected
                       ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10"
-                      : "border-transparent bg-[var(--input)] hover:border-[var(--border-light)]"
+                      : "border-[var(--field-border)] bg-[var(--field-bg)] hover:border-[var(--field-border-hover)]"
                   )}
                 >
-                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--surface)]">
-                    <Icon className="h-4 w-4 text-[var(--muted)]" />
+                  <span
+                    className={cn(
+                      "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
+                      selected
+                        ? "bg-[var(--color-primary)]/15"
+                        : "bg-[var(--surface)]"
+                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        "h-4 w-4",
+                        selected
+                          ? "text-[var(--color-primary)]"
+                          : "text-[var(--muted)]"
+                      )}
+                    />
                   </span>
                   <span className="min-w-0">
                     <span
                       className={cn(
-                        "block text-sm font-semibold",
+                        "block text-[14px] font-semibold",
                         selected
                           ? "text-[var(--color-primary)]"
                           : "text-[var(--foreground)]"
@@ -131,34 +133,23 @@ export function ReportModal({
                     >
                       {option.label}
                     </span>
-                    <span className="block text-xs text-[var(--muted)]">
+                    <span className="mt-0.5 block text-[12px] leading-snug text-[var(--muted-2)]">
                       {option.description}
                     </span>
                   </span>
                 </button>
               );
             })}
-          </div>
-
-          <textarea
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
-            placeholder="Additional details (optional)"
-            rows={3}
-            className="mt-4 w-full resize-none rounded-2xl border border-[var(--border-light)] bg-[var(--input)] p-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--color-primary)]"
-          />
-
-          <PrimaryButton
-            className="mt-4"
-            variant="danger"
-            disabled={!reason || submitting}
-            loading={submitting}
-            onClick={handleSubmit}
-          >
-            Submit Report
-          </PrimaryButton>
-        </div>
       </div>
-    </div>
+
+      <Field label="Additional details" optional className="mt-4">
+        <Textarea
+          value={details}
+          onChange={(e) => setDetails(e.target.value)}
+          placeholder="Anything else our team should know?"
+          rows={3}
+        />
+      </Field>
+    </ModalSheet>
   );
 }

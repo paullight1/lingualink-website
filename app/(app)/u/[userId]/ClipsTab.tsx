@@ -6,7 +6,7 @@ import { timeAgo } from "@/lib/utils";
 import { useUserClips, type UserClipItem } from "./hooks";
 
 function ClipCard({ clip }: { clip: UserClipItem }) {
-  const phrase = clip.phrase || (clip.kind === "video" ? clip.caption : null) || "Untitled";
+  const phrase = clip.phrase || "Untitled";
   const language = "dialect" in clip && clip.dialect ? `${clip.language} / ${clip.dialect}` : clip.language || "Unknown";
 
   return (

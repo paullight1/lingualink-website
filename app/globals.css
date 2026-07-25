@@ -33,19 +33,31 @@
   --color-error: var(--error);
   --color-warning: var(--warning);
 
-  /* Radius (Theme.ts Layout.radius) */
-  --radius-s: 8px;
-  --radius-m: 16px;
-  --radius-l: 24px;
-  --radius-xl: 32px;
+  /*
+   * Radius + spacing from Theme.ts, in a private namespace.
+   *
+   * These were previously declared as `--radius-*` / `--spacing-*`, which are
+   * Tailwind v4's own theme namespaces — so they silently redefined built-in
+   * utilities rather than extending anything. `--radius-xl: 32px` made every
+   * `rounded-xl` render at 32px instead of 12px, `--spacing-xs: 4px` made
+   * `max-w-xs` resolve to 4px (collapsing empty-state text to one word per
+   * line), and declaring the namespaces at all knocked out `rounded-sm`,
+   * `rounded-3xl`, `max-w-xl`, `max-w-3xl`, `max-w-5xl` and `max-w-7xl`.
+   *
+   * Renamed to `--ll-*` so they stay available as design references without
+   * shadowing the framework. Use them as `var(--ll-radius-m)` when needed.
+   */
+  --ll-radius-s: 8px;
+  --ll-radius-m: 16px;
+  --ll-radius-l: 24px;
+  --ll-radius-xl: 32px;
 
-  /* Spacing (Theme.ts Spacing) — extends the default scale */
-  --spacing-xs: 4px;
-  --spacing-s: 8px;
-  --spacing-m: 16px;
-  --spacing-l: 24px;
-  --spacing-xl: 32px;
-  --spacing-xxl: 48px;
+  --ll-space-xs: 4px;
+  --ll-space-s: 8px;
+  --ll-space-m: 16px;
+  --ll-space-l: 24px;
+  --ll-space-xl: 32px;
+  --ll-space-xxl: 48px;
 
   /* Brand gradient + glow */
   --shadow-glow: 0 8px 24px rgba(255, 138, 0, 0.3);
@@ -70,6 +82,19 @@
   --glass-border: rgba(0, 0, 0, 0.1);
   --page-gradient: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
 
+  /*
+   * Form tokens. `--placeholder` is deliberately lighter than `--muted`:
+   * placeholders styled at `--muted` read as real, filled-in values.
+   * `--field-*` back the shared Field/Input kit in components/ui/Field.tsx.
+   */
+  --placeholder: #9ca3af;
+  --field-bg: #ffffff;
+  --field-bg-hover: #fdfdfd;
+  --field-border: rgba(0, 0, 0, 0.12);
+  --field-border-hover: rgba(0, 0, 0, 0.22);
+  --field-ring: rgba(255, 138, 0, 0.18);
+  --field-ring-error: rgba(239, 68, 68, 0.18);
+
   color-scheme: light;
 }
 
@@ -91,6 +116,14 @@
   --glass-bg: rgba(255, 255, 255, 0.04);
   --glass-border: rgba(255, 255, 255, 0.1);
   --page-gradient: radial-gradient(120% 120% at 50% 0%, #1f0802 0%, #0d0200 100%);
+
+  --placeholder: rgba(255, 255, 255, 0.36);
+  --field-bg: rgba(255, 255, 255, 0.05);
+  --field-bg-hover: rgba(255, 255, 255, 0.07);
+  --field-border: rgba(255, 255, 255, 0.14);
+  --field-border-hover: rgba(255, 255, 255, 0.24);
+  --field-ring: rgba(255, 138, 0, 0.22);
+  --field-ring-error: rgba(255, 69, 58, 0.22);
 
   color-scheme: dark;
 }
@@ -117,6 +150,94 @@
   /* Prevent horizontal scroll on mobile */
   html {
     overflow-x: hidden;
+  }
+
+  /*
+   * ---- Form controls -------------------------------------------------
+   * Baseline behaviour every input in the app gets for free, so the shared
+   * Field kit (and any one-off control) starts from something sane.
+   */
+
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  ::placeholder {
+    color: var(--placeholder);
+    opacity: 1; /* Firefox dims placeholders by default */
+  }
+
+  /*
+   * iOS Safari zooms the viewport when a focused control's text is under
+   * 16px. `max(16px, 1em)` lifts only the small ones — a control that already
+   * asks for 17px keeps its 17px.
+   */
+  @media (max-width: 639px) {
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    textarea,
+    select {
+      font-size: max(16px, 1em);
+    }
+  }
+
+  /*
+   * Chrome paints autofilled fields with an opaque pale-yellow background,
+   * which wipes out the glass/translucent field surfaces entirely. Mask it
+   * with an inset shadow in the field colour and keep our own text colour.
+   */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  select:-webkit-autofill {
+    -webkit-text-fill-color: var(--foreground);
+    -webkit-box-shadow: 0 0 0 1000px var(--field-bg) inset;
+    caret-color: var(--color-primary);
+    transition: background-color 100000s ease-in-out 0s;
+  }
+
+  /* Native dropdown lists inherit the page palette, not the OS default. */
+  option,
+  optgroup {
+    background-color: var(--surface);
+    color: var(--foreground);
+  }
+
+  /* Spinners on number inputs are noise in this design. */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+  }
+
+  input,
+  textarea,
+  select,
+  button {
+    caret-color: var(--color-primary);
+  }
+
+  ::selection {
+    background: rgba(255, 138, 0, 0.28);
+  }
+
+  /*
+   * Keyboard focus is always visible. Components that draw their own ring on
+   * the wrapper opt out with `outline-none` on the control itself.
+   */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 
   /* Thin, brand-tinted scrollbars */
@@ -159,5 +280,38 @@
   /* Hide element until framer-motion / hydration kicks in — optional */
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Modal entrance — a sheet rising on mobile, a card settling on desktop. */
+  @keyframes ll-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes ll-sheet-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  .animate-fade-in {
+    animation: ll-fade-in 0.18s ease-out;
+  }
+  .animate-sheet-in {
+    animation: ll-sheet-in 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-fade-in,
+    .animate-sheet-in {
+      animation: none;
+    }
   }
 }

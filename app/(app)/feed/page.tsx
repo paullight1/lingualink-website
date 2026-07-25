@@ -4,6 +4,7 @@
  *  search, and manual refresh, backed by React Query + Supabase. */
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { Radio, Rss, TrendingUp } from "lucide-react";
 
@@ -24,7 +25,8 @@ import {
   fetchLiveStreams,
   fetchTrendingPosts,
 } from "./queries";
-import type { FeedTab, LiveStreamRow } from "./types";
+import type { FeedTab } from "./types";
+import type { LiveStream } from "@/lib/api/live";
 
 function matchesSearch(post: Post, query: string): boolean {
   const q = query.trim().toLowerCase();
@@ -127,9 +129,9 @@ export default function FeedPage() {
           <LiveSection loading={liveQuery.isLoading} streams={liveQuery.data ?? []} />
         ) : (
           <div className="flex flex-col gap-4">
-            {tab === "feed" && (storiesQuery.data?.length ?? 0) > 0 && (
-              <StoriesRail stories={storiesQuery.data ?? []} />
-            )}
+            {/* Always rendered on the feed tab — the rail leads with the
+                viewer's own "add story" bubble even when nobody has posted. */}
+            {tab === "feed" && <StoriesRail stories={storiesQuery.data ?? []} />}
 
             {postsLoading ? (
               <FeedSkeleton />
@@ -172,25 +174,31 @@ function LiveSection({
   streams,
 }: {
   loading: boolean;
-  streams: LiveStreamRow[];
+  streams: LiveStream[];
 }) {
   if (loading) return <FeedSkeleton count={2} />;
 
-  if (streams.length === 0) {
-    return (
-      <EmptyState
-        icon={<Radio className="h-7 w-7" />}
-        title="No live streams right now"
-        message="Live streaming is coming soon to LinguaLink web — check back later!"
-      />
-    );
-  }
-
   return (
     <div className="flex flex-col gap-3">
-      {streams.map((stream) => (
-        <LiveStreamCard key={stream.id} stream={stream} />
-      ))}
+      <Link
+        href="/live/new"
+        className="flex items-center justify-center gap-2 rounded-full bg-brand-gradient px-5 py-3 text-sm font-semibold text-white shadow-glow"
+      >
+        <Radio className="h-4 w-4" />
+        Go Live
+      </Link>
+
+      {streams.length === 0 ? (
+        <EmptyState
+          icon={<Radio className="h-7 w-7" />}
+          title="No live streams right now"
+          message="Be the first to go live today."
+        />
+      ) : (
+        streams.map((stream) => (
+          <LiveStreamCard key={stream.id} stream={stream} />
+        ))
+      )}
     </div>
   );
 }

@@ -170,8 +170,7 @@ export default function SettingsPage() {
           <SettingsItem
             icon={<Award className="h-4 w-4" />}
             label="Ambassador Program"
-            value="Coming soon"
-            onClick={() => toast("Ambassador Program is coming soon!", { icon: "🏅" })}
+            onClick={() => router.push("/ambassador")}
           />
         </SettingsSection>
 

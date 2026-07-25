@@ -46,29 +46,40 @@ export function StepHeritage({
 
   return (
     <div>
-      <h1 className="text-[32px] font-extrabold leading-tight tracking-tight text-[var(--foreground)] sm:text-[34px]">
-        Your <span className="text-[var(--color-primary)]">Heritage</span>
+      <h1 className="text-[28px] font-extrabold leading-tight tracking-tight text-[var(--foreground)] sm:text-[32px]">
+        Your <span className="text-brand-gradient">Heritage</span>
       </h1>
-      <p className="mb-8 mt-2 text-base text-[var(--muted)]">
+      <p className="mb-8 mt-2 text-[15px] leading-snug text-[var(--muted)]">
         Where are you from?
       </p>
 
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         <div>
-          <label className="mb-2 block text-sm font-semibold tracking-wide text-[var(--muted)]">
+          <label
+            id="heritage-country-label"
+            className="mb-2 block text-[13px] font-semibold text-[var(--foreground)]"
+          >
             Country
           </label>
           <button
             type="button"
             onClick={() => setModalOpen(true)}
-            className="flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3.5 text-left transition"
+            aria-labelledby="heritage-country-label"
+            aria-haspopup="dialog"
+            className={
+              "flex h-14 w-full items-center justify-between gap-3 rounded-[16px] border px-4 text-left transition-colors " +
+              "hover:border-[var(--field-border-hover)] focus-visible:border-[var(--color-primary)]"
+            }
             style={
               country
                 ? {
                     borderColor: "var(--color-primary)",
                     backgroundColor: "rgba(255,138,0,0.1)",
                   }
-                : { borderColor: "var(--border-light)" }
+                : {
+                    borderColor: "var(--field-border)",
+                    backgroundColor: "var(--field-bg)",
+                  }
             }
           >
             {country ? (
@@ -90,9 +101,12 @@ export function StepHeritage({
 
         {country && (
           <div>
-            <label className="mb-2 block text-sm font-semibold tracking-wide text-[var(--muted)]">
+            <p className="mb-1 text-[13px] font-semibold text-[var(--foreground)]">
               Languages you speak
-            </label>
+            </p>
+            <p className="mb-3 text-[12px] text-[var(--muted-2)]">
+              Pick as many as apply — you can add your own too.
+            </p>
             <div className="flex flex-wrap gap-2.5">
               {country.languages.map((lang) => (
                 <Chip
@@ -120,19 +134,31 @@ export function StepHeritage({
                 ))}
 
               {showCustomInput ? (
-                <div className="flex items-center gap-1.5 rounded-full border border-[var(--border-light)] bg-[var(--input)] pl-3.5 pr-1.5 py-1">
+                <div className="flex h-10 items-center gap-1.5 rounded-full border border-[var(--field-border)] bg-[var(--field-bg)] py-1 pl-4 pr-1.5 transition-colors focus-within:border-[var(--color-primary)] focus-within:shadow-[0_0_0_4px_var(--field-ring)]">
                   <input
                     autoFocus
                     value={customLang}
                     onChange={(e) => setCustomLang(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && addCustomLang()}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addCustomLang();
+                      }
+                      if (e.key === "Escape") {
+                        setCustomLang("");
+                        setShowCustomInput(false);
+                      }
+                    }}
+                    onBlur={() => !customLang.trim() && setShowCustomInput(false)}
+                    aria-label="Add a language"
                     placeholder="Language name"
-                    className="w-28 bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+                    className="w-32 bg-transparent text-[14px] text-[var(--foreground)] outline-none placeholder:text-[var(--placeholder)]"
                   />
                   <button
                     type="button"
                     onClick={addCustomLang}
-                    className="rounded-full bg-[var(--color-primary)] px-2.5 py-1 text-xs font-semibold text-white"
+                    disabled={!customLang.trim()}
+                    className="h-7 shrink-0 rounded-full bg-[var(--color-primary)] px-3 text-[12px] font-bold text-white transition disabled:opacity-40"
                   >
                     Add
                   </button>

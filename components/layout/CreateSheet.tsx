@@ -2,13 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Mic, Video, Wallet, ListChecks, X } from "lucide-react";
+import { Mic, Video, Wallet, ListChecks, BookImage, Radio, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * Bottom-sheet "Create" menu opened by the center FAB. In-scope actions:
- * Record Audio, Record Video, View Rewards, Tasks. (Story / Go-Live / Games
- * are deferred per scope.)
+ * Bottom-sheet "Create" menu opened by the center FAB. Mirrors the mobile
+ * create options.
  */
 interface Action {
   label: string;
@@ -21,6 +20,8 @@ interface Action {
 const ACTIONS: Action[] = [
   { label: "Record Audio", desc: "Share your voice", icon: Mic, color: "#FF8A00", href: "/record?mode=voice" },
   { label: "Record Video", desc: "Tell a story on camera", icon: Video, color: "#8B5CF6", href: "/record?mode=video" },
+  { label: "Add a Story", desc: "Disappears in 24 hours", icon: BookImage, color: "#EC4899", href: "/story/new" },
+  { label: "Go Live", desc: "Stream to your followers", icon: Radio, color: "#EF4444", href: "/live/new" },
   { label: "Do a Task", desc: "Earn from microtasks", icon: ListChecks, color: "#3B82F6", href: "/tasks" },
   { label: "View Rewards", desc: "Check your wallet", icon: Wallet, color: "#10B981", href: "/rewards" },
 ];

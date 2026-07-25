@@ -21,7 +21,7 @@ async function uploadToBucket(
   contentType: string
 ): Promise<UploadResult> {
   const path = `${userId}/${filename}`;
-  const token = getSupabaseToken();
+  const token = await getSupabaseToken();
 
   // Preferred: direct REST with the Clerk JWT (matches mobile).
   if (token) {

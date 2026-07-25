@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { Mic, Square, Shuffle, Wand2, Globe, Trash2 } from "lucide-react";
-import { GlassCard, PrimaryButton, WaveformPlayer } from "@/components/ui";
+import {
+  GlassCard,
+  Input,
+  PrimaryButton,
+  Textarea,
+  WaveformPlayer,
+} from "@/components/ui";
 import { cn, formatDuration } from "@/lib/utils";
 import { useCurrentUserId, useLanguages, type LanguageOption } from "@/lib/query/hooks";
 import { supabase } from "@/lib/supabase/client";
@@ -190,10 +196,17 @@ export function VoiceRecorder() {
               setCustomPrompt("");
             }}
             disabled={recorder.status === "recording"}
-            className="w-full appearance-none bg-transparent text-[15px] font-medium text-[var(--foreground)] outline-none disabled:opacity-60"
+            className="w-full cursor-pointer appearance-none bg-transparent bg-[right_center] bg-no-repeat pr-6 text-[15px] font-medium text-[var(--foreground)] outline-none disabled:cursor-not-allowed disabled:opacity-60"
+            style={{
+              // Inline chevron so the control still reads as a dropdown after
+              // `appearance-none` strips the native one.
+              backgroundImage:
+                "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>\")",
+              backgroundSize: "16px 16px",
+            }}
           >
             {languages.map((lang) => (
-              <option key={lang.id} value={lang.id} className="bg-[var(--surface)]">
+              <option key={lang.id} value={lang.id}>
                 {lang.dialect ? `${lang.name} (${lang.dialect})` : lang.name}
               </option>
             ))}
@@ -266,17 +279,17 @@ export function VoiceRecorder() {
               </button>
             )}
           </div>
-          <textarea
+          <Textarea
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
             disabled={recorder.status === "recording"}
+            aria-label={promptCardTitle}
             placeholder={
               isSpeakingFreely
                 ? "Write what you're saying (optional)…"
                 : "What are you saying?"
             }
             rows={3}
-            className="w-full resize-none rounded-xl border border-transparent bg-[var(--input)] p-3.5 text-[15px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--color-primary)] disabled:opacity-60"
           />
         </GlassCard>
       )}
@@ -343,14 +356,17 @@ export function VoiceRecorder() {
       {hasRecorded && (
         <>
           <GlassCard className="p-5">
-            <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-[var(--color-primary)]">
+            <label
+              htmlFor="clip-translation"
+              className="mb-2 block text-xs font-bold uppercase tracking-wide text-[var(--color-primary)]"
+            >
               Translation (optional)
             </label>
-            <input
+            <Input
+              id="clip-translation"
               value={translation}
               onChange={(e) => setTranslation(e.target.value)}
               placeholder="English translation…"
-              className="w-full rounded-xl border border-transparent bg-[var(--input)] p-3.5 text-[15px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--color-primary)]"
             />
           </GlassCard>
 

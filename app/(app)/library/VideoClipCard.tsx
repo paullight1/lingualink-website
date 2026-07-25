@@ -7,7 +7,7 @@ import type { VideoClipRow } from "@/lib/types";
 
 /** A video clip tile: thumbnail (with duration badge) + caption + date. */
 export function VideoClipCard({ clip }: { clip: VideoClipRow }) {
-  const caption = clip.caption || clip.phrase || "Video";
+  const caption = clip.phrase || "Video";
   return (
     <GlassCard className="overflow-hidden p-0">
       <div className="relative flex aspect-square items-center justify-center bg-[var(--input)]">

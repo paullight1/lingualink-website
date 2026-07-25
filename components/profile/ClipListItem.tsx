@@ -55,7 +55,7 @@ export function ClipListItem({ clip }: { clip: ProfileClip }) {
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-[var(--foreground)]">
-          {clip.caption || clip.phrase || "Untitled video"}
+          {clip.phrase || "Untitled video"}
         </p>
         <ClipMeta clip={clip} language={language} />
       </div>

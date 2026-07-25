@@ -2,19 +2,7 @@
 
 export type FeedTab = "feed" | "trending" | "live";
 
-/** `live_streams` isn't in the FOUNDATION table list yet, so this is a best-effort
- *  shape based on the mobile app's liveService; queries fail soft if it's missing. */
-export interface LiveStreamRow {
-  id: string;
-  user_id: string;
-  title?: string | null;
-  is_live: boolean;
-  viewer_count?: number | null;
-  created_at: string;
-  profiles?: {
-    id?: string;
-    username?: string | null;
-    full_name?: string | null;
-    avatar_url?: string | null;
-  } | null;
-}
+/* Live streams are read through `/live/discover` (see `lib/api/live.ts`), which
+   is also what the mobile app uses, so the feed no longer models the
+   `live_streams` table directly. Note if you ever query it: the owner column is
+   `streamer_id`, not `user_id`. */

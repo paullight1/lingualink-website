@@ -64,7 +64,31 @@ async function fetchLanguages(): Promise<LanguageOption[]> {
     .select("id, name, dialect")
     .order("name", { ascending: true });
   if (error) throw error;
-  return (data as LanguageOption[]) ?? [];
+
+  // The table carries real duplicates — "Igbo" appears 18 times, "Nembe" 9,
+  // and so on. Collapsing identical name+dialect pairs keeps every genuinely
+  // distinct dialect while stopping pickers from listing the same option over
+  // and over (and stopping React from warning about repeated keys).
+  const seen = new Set<string>();
+  const unique: LanguageOption[] = [];
+  for (const row of (data as LanguageOption[]) ?? []) {
+    const key = `${row.name.trim().toLowerCase()}|${(row.dialect ?? "").trim().toLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(row);
+  }
+  return unique;
+}
+
+/**
+ * Distinct language names, for pickers that store a bare name rather than a
+ * language row (going live, starting a game room).
+ */
+export function uniqueLanguageNames(
+  languages: LanguageOption[] | undefined
+): string[] {
+  const names = new Set((languages ?? []).map((l) => l.name.trim()).filter(Boolean));
+  return names.size > 0 ? [...names].sort() : ["English"];
 }
 
 /**

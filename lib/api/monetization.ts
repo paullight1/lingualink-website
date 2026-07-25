@@ -1,6 +1,9 @@
 import { authFetch, parseResponse } from "./authFetch";
 import type {
+  BankItem,
+  BankResolveResult,
   EarningsSummary,
+  LinkedBank,
   MonetizationStatus,
   ValidationQueueItem,
   ValidationQuality,
@@ -72,6 +75,57 @@ export const monetizationApi = {
   },
   async getWithdrawals(limit = 20) {
     return parseResponse(await authFetch(`/withdrawals?limit=${limit}`));
+  },
+
+  /* Bank / payouts — mirrors mobile's `/bank/*` calls. Each endpoint wraps its
+     result in `{ success, data }`, so unwrap `data` here rather than at
+     every call site. */
+  async getBankList(): Promise<BankItem[]> {
+    const res = await parseResponse<{ data: BankItem[] }>(
+      await authFetch("/bank/list", { requireAuth: false })
+    );
+    return res.data ?? [];
+  },
+  async resolveBank(
+    accountNumber: string,
+    bankCode: string
+  ): Promise<BankResolveResult> {
+    const res = await parseResponse<{ data: BankResolveResult }>(
+      await authFetch("/bank/resolve", {
+        method: "POST",
+        body: JSON.stringify({ accountNumber, bankCode }),
+      })
+    );
+    return res.data;
+  },
+  async linkBank(
+    accountNumber: string,
+    bankCode: string,
+    manualDetails?: { bankName: string; accountName: string }
+  ): Promise<{ accountName: string; bankName: string }> {
+    const res = await parseResponse<{
+      data: { accountName: string; bankName: string };
+    }>(
+      await authFetch("/bank/link", {
+        method: "POST",
+        body: JSON.stringify({ accountNumber, bankCode, manualDetails }),
+      })
+    );
+    return res.data;
+  },
+  async getLinkedBank(): Promise<LinkedBank | null> {
+    try {
+      const res = await parseResponse<{ data: LinkedBank | null }>(
+        await authFetch("/bank/linked")
+      );
+      return res.data ?? null;
+    } catch {
+      // No linked account yet is a normal state, not an error to surface.
+      return null;
+    }
+  },
+  async unlinkBank(): Promise<void> {
+    await authFetch("/bank/unlink", { method: "DELETE" });
   },
 
   /* Config */

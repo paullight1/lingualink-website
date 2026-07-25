@@ -11,11 +11,13 @@ import {
   BookOpen,
   Link as LinkIcon,
   Flag,
+  Repeat2,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { GlassCard, UserAvatar, WaveformPlayer } from "@/components/ui";
 import { VoiceClipInteractions } from "./VoiceClipInteractions";
 import { ReportModal } from "@/components/moderation/ReportModal";
+import { CommentsSheet } from "@/components/comments/CommentsSheet";
 import { supabase } from "@/lib/supabase/client";
 import { cn, formatDuration } from "@/lib/utils";
 import type { Post } from "@/lib/types";
@@ -46,6 +48,8 @@ export function FeedPost({ post, currentUserId, onOpenProfile }: FeedPostProps) 
   const [menuOpen, setMenuOpen] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [comments, setComments] = useState(post.engagement.comments);
 
   const isSelf = !!currentUserId && currentUserId === post.user.id;
 
@@ -316,20 +320,46 @@ export function FeedPost({ post, currentUserId, onOpenProfile }: FeedPostProps) 
         <VoiceClipInteractions
           postId={post.id}
           likes={likes}
-          comments={post.engagement.comments}
+          comments={comments}
           isLiked={isLiked}
           onLike={handleLike}
+          // `comments.voice_clip_id` means only voice clips can be commented on,
+          // same as mobile.
+          onComment={
+            post.type === "voice" ? () => setCommentsOpen(true) : undefined
+          }
         />
-        <Link
-          href={`/validate/${post.id}`}
-          className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-medium text-[var(--color-accent-green)] transition hover:bg-[var(--color-accent-green)]/10"
-        >
-          <CheckCircle2 className="h-[18px] w-[18px]" />
-          {post.engagement.validations > 0 && (
-            <span className="tabular-nums">{post.engagement.validations}</span>
+        <div className="flex items-center gap-1">
+          {post.type === "voice" && !isSelf && (
+            <Link
+              href={`/duet/${post.id}`}
+              aria-label="Duet this clip"
+              className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-medium text-[var(--color-accent-purple)] transition hover:bg-[var(--color-accent-purple)]/10"
+            >
+              <Repeat2 className="h-[18px] w-[18px]" />
+            </Link>
           )}
-        </Link>
+          <Link
+            href={`/validate/${post.id}`}
+            aria-label="Validate this clip"
+            className="flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-sm font-medium text-[var(--color-accent-green)] transition hover:bg-[var(--color-accent-green)]/10"
+          >
+            <CheckCircle2 className="h-[18px] w-[18px]" />
+            {post.engagement.validations > 0 && (
+              <span className="tabular-nums">{post.engagement.validations}</span>
+            )}
+          </Link>
+        </div>
       </div>
+
+      {post.type === "voice" && (
+        <CommentsSheet
+          open={commentsOpen}
+          onClose={() => setCommentsOpen(false)}
+          clipId={post.id}
+          onCountChange={(delta) => setComments((c) => Math.max(0, c + delta))}
+        />
+      )}
 
       <ReportModal
         open={reportOpen}

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
 import { ChevronRight } from "lucide-react";
-import { PrimaryButton } from "@/components/ui";
+import { PrimaryButton, StepProgress } from "@/components/ui";
 import { supabase } from "@/lib/supabase/client";
 import {
   useCurrentUserId,
@@ -150,17 +150,7 @@ export default function ProfileSetupPage() {
 
   return (
     <div className="flex min-h-[80vh] w-full flex-col">
-      <div className="mb-8 flex flex-col items-center gap-2.5">
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--input)]">
-          <div
-            className="h-full rounded-full bg-brand-gradient transition-all duration-500"
-            style={{ width: `${(step / 2) * 100}%` }}
-          />
-        </div>
-        <span className="text-[11px] font-semibold tracking-[2px] text-[var(--muted)]">
-          STEP {step} OF 2
-        </span>
-      </div>
+      <StepProgress step={step} total={2} className="mb-8" />
 
       <div className="flex-1">
         {step === 1 ? (

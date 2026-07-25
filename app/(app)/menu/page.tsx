@@ -10,6 +10,13 @@ import {
   Wallet,
   Trophy,
   ShoppingCart,
+  CreditCard,
+  Megaphone,
+  Gamepad2,
+  Users,
+  Repeat2,
+  UserPlus,
+  Download,
   Settings as SettingsIcon,
   Bell,
   Bookmark,
@@ -23,6 +30,7 @@ import { GlassCard, UserAvatar, SettingsSection, SettingsItem } from "@/componen
 import { Skeleton } from "@/components/ui/Skeleton";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { normalizeUsername } from "@/lib/utils";
+import type { ProfileRow } from "@/lib/types";
 
 /** XP thresholds → level name, mirrors mobile `LEVELS`. */
 const LEVELS = [
@@ -39,6 +47,18 @@ function levelForXp(xp: number) {
   );
 }
 
+/**
+ * `profiles` has no `xp` column in the live database (mobile's MenuScreen
+ * selects one and gets nothing back too). Until the column exists, reading it
+ * would label every user "Newbie" regardless of contribution, so the badge is
+ * hidden rather than shown wrong. The ladder above is left intact so it starts
+ * working the moment XP is actually stored.
+ */
+function xpFor(profile: ProfileRow | null | undefined): number | null {
+  const xp = (profile as { xp?: number | null } | null | undefined)?.xp;
+  return typeof xp === "number" ? xp : null;
+}
+
 export default function MenuPage() {
   const { data: profile, isLoading } = useMyProfile();
   const { signOut } = useClerk();
@@ -46,7 +66,8 @@ export default function MenuPage() {
 
   const displayName = profile?.full_name || "LinguaLink User";
   const handle = normalizeUsername(profile?.username || "") || "user";
-  const level = levelForXp(profile?.xp ?? 0);
+  const xp = xpFor(profile);
+  const level = xp === null ? null : levelForXp(xp);
 
   const handleLogout = async () => {
     await signOut();
@@ -87,9 +108,11 @@ export default function MenuPage() {
                   <p className="truncate text-sm text-[var(--muted)]">
                     @{handle}
                   </p>
-                  <span className="mt-2 inline-block rounded-full bg-brand-gradient px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-                    {level.name}
-                  </span>
+                  {level && (
+                    <span className="mt-2 inline-block rounded-full bg-brand-gradient px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+                      {level.name}
+                    </span>
+                  )}
                 </div>
                 <ChevronRight className="h-5 w-5 shrink-0 text-[var(--muted)]" />
               </div>
@@ -114,6 +137,40 @@ export default function MenuPage() {
             label="Store"
             onClick={() => router.push("/store")}
           />
+          <SettingsItem
+            icon={<CreditCard className="h-4 w-4" />}
+            label="Payment Settings"
+            onClick={() => router.push("/payment-settings")}
+          />
+          <SettingsItem
+            icon={<Megaphone className="h-4 w-4" />}
+            label="Ambassador Program"
+            onClick={() => router.push("/ambassador")}
+          />
+        </SettingsSection>
+
+        {/* Community */}
+        <SettingsSection title="Community">
+          <SettingsItem
+            icon={<Gamepad2 className="h-4 w-4" />}
+            label="Games"
+            onClick={() => router.push("/games")}
+          />
+          <SettingsItem
+            icon={<Users className="h-4 w-4" />}
+            label="Groups"
+            onClick={() => router.push("/groups")}
+          />
+          <SettingsItem
+            icon={<Repeat2 className="h-4 w-4" />}
+            label="Remix History"
+            onClick={() => router.push("/remixes")}
+          />
+          <SettingsItem
+            icon={<UserPlus className="h-4 w-4" />}
+            label="Invite Friends"
+            onClick={() => router.push("/invites")}
+          />
         </SettingsSection>
 
         {/* Account */}
@@ -127,6 +184,11 @@ export default function MenuPage() {
             icon={<Bell className="h-4 w-4" />}
             label="Notifications"
             onClick={() => router.push("/notifications")}
+          />
+          <SettingsItem
+            icon={<Download className="h-4 w-4" />}
+            label="Export My Data"
+            onClick={() => router.push("/data-export")}
           />
         </SettingsSection>
 
@@ -144,7 +206,7 @@ export default function MenuPage() {
           <SettingsItem
             icon={<HelpCircle className="h-4 w-4" />}
             label="FAQ"
-            onClick={() => router.push("/settings")}
+            onClick={() => router.push("/faq")}
           />
           <SettingsItem
             icon={<Mail className="h-4 w-4" />}

@@ -3,12 +3,13 @@
 /** Built by Agent 13 — other-user profile: header, follow/unfollow, mutuals, Clips/Badges tabs. */
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { UserX } from "lucide-react";
 import { AppHeader, EmptyState, SegmentedTabs } from "@/components/ui";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { useCurrentUserId, useProfile } from "@/lib/query/hooks";
+import { createOrGetDm } from "@/lib/api/chat";
 import { ProfileHeader } from "./ProfileHeader";
 import { ClipsTab } from "./ClipsTab";
 import { BadgesTab } from "./BadgesTab";
@@ -18,6 +19,7 @@ export default function UserProfilePage() {
   const params = useParams<{ userId: string }>();
   const userId = params?.userId;
   const viewerId = useCurrentUserId();
+  const router = useRouter();
   const [tab, setTab] = useState<"clips" | "badges">("clips");
 
   const {
@@ -55,6 +57,18 @@ export default function UserProfilePage() {
     toggleFollow.mutate(!(followState.data?.isFollowing ?? false));
   };
 
+  /** Opens (or creates) the DM with this user via the shared `create_or_get_dm` RPC. */
+  const handleMessage = async () => {
+    if (!userId) return;
+    try {
+      const conversationId = await createOrGetDm(userId);
+      router.push(`/chat/${conversationId}`);
+    } catch (err) {
+      console.error("[profile] could not open DM", err);
+      toast.error("Couldn't open that conversation");
+    }
+  };
+
   return (
     <>
       <AppHeader
@@ -69,7 +83,7 @@ export default function UserProfilePage() {
           followLoading={followState.isLoading}
           toggling={toggleFollow.isPending}
           onToggleFollow={handleToggleFollow}
-          onMessage={() => toast("Messaging is coming soon", { icon: "💬" })}
+          onMessage={handleMessage}
         />
 
         <SegmentedTabs

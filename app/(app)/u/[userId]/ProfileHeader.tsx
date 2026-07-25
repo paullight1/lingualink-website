@@ -62,7 +62,9 @@ export function ProfileHeader({
             <h1 className="truncate text-xl font-bold text-[var(--foreground)]">
               {profile?.full_name || "User"}
             </h1>
-            {profile?.is_verified && (
+            {/* "Verified" comes from having verified dialects — there is no
+                boolean `is_verified` column on `profiles`. */}
+            {(profile?.verified_dialects?.length ?? 0) > 0 && (
               <BadgeCheck className="h-5 w-5 shrink-0 text-[var(--color-primary)]" />
             )}
           </div>

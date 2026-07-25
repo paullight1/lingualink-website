@@ -12,8 +12,15 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-    await auth.protect();
+  if (isPublicRoute(req)) return;
+
+  // `auth.protect()` renders a 404 for signed-out visitors, which makes a
+  // shared link like /post/<id> look broken. Redirect to sign-in instead and
+  // send them back to the link once they're in. The route is equally protected
+  // either way — this only changes what a logged-out visitor is shown.
+  const { userId, redirectToSignIn } = await auth();
+  if (!userId) {
+    return redirectToSignIn({ returnBackUrl: req.url });
   }
 });
 

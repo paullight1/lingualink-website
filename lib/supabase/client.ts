@@ -3,55 +3,50 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/config";
 
 /*
  * Browser Supabase client — ported from the mobile app's src/supabaseClient.ts.
- * Clerk owns the session; we inject the Clerk `supabase`-template JWT into the
- * Authorization header so Postgres RLS sees the user. `setSupabaseToken` is
- * called by the SupabaseTokenBridge client component on the Clerk token cycle.
+ * Clerk owns the session; the Clerk `supabase`-template JWT is attached to each
+ * request so Postgres RLS sees the user.
+ *
+ * The token is resolved per-request via supabase-js's `accessToken` callback
+ * rather than being pushed in ahead of time. That ordering matters: React runs
+ * a parent's effects *after* its children's, so a provider that injected the
+ * token from its own effect always lost the race against the first wave of
+ * child queries — those ran as anon, and RPCs that check `auth.uid()` failed
+ * with "Not authenticated". Pulling the token at request time removes the race
+ * and keeps it fresh without a refresh interval.
  */
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  // Surfaces a clear error instead of a cryptic network failure.
-  console.error(
-    "[Supabase] Missing NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY"
-  );
+/* Missing-env checking lives in lib/config.ts, which throws by variable name
+ * before this module ever reaches createClient. */
+
+/** Registered by SupabaseTokenBridge; null while signed out. */
+let tokenGetter: (() => Promise<string | null>) | null = null;
+
+export function setSupabaseTokenGetter(
+  getter: (() => Promise<string | null>) | null
+) {
+  tokenGetter = getter;
 }
 
-let currentClerkToken: string | null = null;
-let authenticatedClient: SupabaseClient | null = null;
-
-const baseSupabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { persistSession: false, autoRefreshToken: false },
-  global: { headers: { "X-Client-Info": "lingualink-web" } },
-});
-
-export const setSupabaseToken = (token: string | null) => {
-  currentClerkToken = token;
-  if (token) {
-    authenticatedClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: false, autoRefreshToken: false },
-      global: {
-        headers: {
-          "X-Client-Info": "lingualink-web",
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    });
-  } else {
-    authenticatedClient = null;
+/** Latest Clerk JWT, or null when signed out. Safe to call before sign-in. */
+export async function getSupabaseToken(): Promise<string | null> {
+  if (!tokenGetter) return null;
+  try {
+    return await tokenGetter();
+  } catch (err) {
+    console.warn("[Supabase] token fetch failed", err);
+    return null;
   }
-};
+}
 
-/** Proxy that routes to the authenticated client when a token is present. */
-const supabaseProxy = new Proxy(baseSupabase, {
-  get(target, prop, receiver) {
-    const client = authenticatedClient || target;
-    const value = Reflect.get(client, prop, receiver);
-    return typeof value === "function" ? value.bind(client) : value;
-  },
-});
+export const supabase: SupabaseClient = createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
+  {
+    // Clerk is the session authority — don't let supabase-js manage one.
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { headers: { "X-Client-Info": "lingualink-web" } },
+    accessToken: () => getSupabaseToken(),
+  }
+);
 
-export const supabase = supabaseProxy as SupabaseClient;
-
-export const hasAuthToken = (): boolean => currentClerkToken !== null;
-export const getSupabaseToken = (): string | null => currentClerkToken;
-export const getAuthenticatedSupabase = (): SupabaseClient =>
-  authenticatedClient || baseSupabase;
+export const hasAuthToken = (): boolean => tokenGetter !== null;

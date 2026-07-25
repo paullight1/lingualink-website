@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Bell, RefreshCw, Search, X } from "lucide-react";
+import { SearchInput } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
 /** Wordmark + expanding inline search + notifications link + manual refresh. */
@@ -27,19 +28,21 @@ export function FeedTopBar({
   return (
     <div className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b border-[var(--border-light)] bg-[var(--background)]/90 px-4 backdrop-blur-md">
       {expanded ? (
-        <div className="flex flex-1 items-center gap-2 rounded-full bg-[var(--input)] px-3 py-2">
-          <Search className="h-4 w-4 shrink-0 text-[var(--muted)]" />
-          <input
+        <div className="flex flex-1 items-center gap-1">
+          <SearchInput
             autoFocus
+            size="sm"
+            label="Search phrases and people"
+            placeholder="Search phrases, people…"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search phrases, people..."
-            className="w-full bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
+            onKeyDown={(e) => e.key === "Escape" && closeSearch()}
           />
           <button
+            type="button"
             onClick={closeSearch}
             aria-label="Close search"
-            className="shrink-0 text-[var(--muted)] hover:text-[var(--foreground)]"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[var(--muted)] transition-colors hover:bg-[var(--input)] hover:text-[var(--foreground)]"
           >
             <X className="h-4 w-4" />
           </button>

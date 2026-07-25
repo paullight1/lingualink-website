@@ -12,7 +12,7 @@ import {
   VideoOff,
   Loader2,
 } from "lucide-react";
-import { GlassCard, PrimaryButton, EmptyState } from "@/components/ui";
+import { GlassCard, PrimaryButton, EmptyState, Textarea } from "@/components/ui";
 import { uploadVideo } from "@/lib/storage";
 import { supabase } from "@/lib/supabase/client";
 import { useCurrentUserId } from "@/lib/query/hooks";
@@ -265,15 +265,18 @@ export function VideoRecorder({
         </div>
 
         <GlassCard className="p-4">
-          <label className="mb-2 block text-xs font-bold uppercase tracking-wide text-[var(--color-primary)]">
+          <label
+            htmlFor="video-caption"
+            className="mb-2 block text-xs font-bold uppercase tracking-wide text-[var(--color-primary)]"
+          >
             Description
           </label>
-          <textarea
+          <Textarea
+            id="video-caption"
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             placeholder="What are you saying in this video?"
             rows={3}
-            className="w-full resize-none bg-transparent text-sm text-[var(--foreground)] placeholder:text-[var(--muted)] focus:outline-none"
           />
         </GlassCard>
 

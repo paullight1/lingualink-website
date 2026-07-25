@@ -7,9 +7,16 @@ import { useState, type FormEvent } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSignIn, AuthenticateWithRedirectCallback } from "@clerk/nextjs";
-import { Mail, Lock, Eye, EyeOff, LogIn, ChevronLeft } from "lucide-react";
+import { Mail, Lock, LogIn, ChevronLeft } from "lucide-react";
 import toast from "react-hot-toast";
-import { GlassCard, PrimaryButton, Spinner } from "@/components/ui";
+import {
+  Field,
+  GlassCard,
+  Input,
+  PasswordInput,
+  PrimaryButton,
+  Spinner,
+} from "@/components/ui";
 import { GoogleGlyph } from "./GoogleGlyph";
 
 /** Pull a human-readable message out of a Clerk API error. */
@@ -50,7 +57,6 @@ function SignInFlow() {
   // sign-in fields
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -58,7 +64,6 @@ function SignInFlow() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetCode, setResetCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [showNewPassword, setShowNewPassword] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
 
   const disabled = loading || googleLoading;
@@ -170,8 +175,6 @@ function SignInFlow() {
         setResetCode={setResetCode}
         newPassword={newPassword}
         setNewPassword={setNewPassword}
-        showNewPassword={showNewPassword}
-        setShowNewPassword={setShowNewPassword}
         resetLoading={resetLoading}
         onSendCode={handleSendResetCode}
         onResetPassword={handleResetPassword}
@@ -189,78 +192,47 @@ function SignInFlow() {
         Continue your legacy of language preservation.
       </p>
 
-      <form onSubmit={handleSignIn} className="mt-10 flex w-full flex-col gap-6">
-        <div className="flex flex-col gap-2.5">
-          <label
-            htmlFor="sign-in-email"
-            className="text-center text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]"
-          >
-            Email Address
-          </label>
-          <GlassCard className="h-16 rounded-[20px] px-4" intensity={30}>
-            <div className="flex h-full items-center gap-4">
-              <Mail className="h-[22px] w-[22px] shrink-0 text-[var(--muted)]" />
-              <input
-                id="sign-in-email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                autoCapitalize="none"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-full w-full min-w-0 bg-transparent text-center text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
-              />
-            </div>
-          </GlassCard>
-        </div>
+      <form onSubmit={handleSignIn} className="mt-10 flex w-full flex-col gap-5">
+        <Field label="Email address" htmlFor="sign-in-email">
+          <Input
+            id="sign-in-email"
+            variant="glass"
+            icon={Mail}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            placeholder="name@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </Field>
 
-        <div className="flex flex-col gap-2.5">
-          <label
-            htmlFor="sign-in-password"
-            className="text-center text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]"
-          >
-            Password
-          </label>
-          <GlassCard className="h-16 rounded-[20px] px-4" intensity={30}>
-            <div className="flex h-full items-center gap-4">
-              <Lock className="h-[22px] w-[22px] shrink-0 text-[var(--muted)]" />
-              <input
-                id="sign-in-password"
-                type={showPassword ? "text" : "password"}
-                autoComplete="current-password"
-                autoCapitalize="none"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-full w-full min-w-0 bg-transparent text-center text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword((s) => !s)}
-                className="shrink-0 text-[var(--color-primary)]"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <EyeOff className="h-[22px] w-[22px]" />
-                ) : (
-                  <Eye className="h-[22px] w-[22px]" />
-                )}
-              </button>
-            </div>
-          </GlassCard>
+        <div className="flex flex-col gap-2">
+          <Field label="Password" htmlFor="sign-in-password">
+            <PasswordInput
+              id="sign-in-password"
+              variant="glass"
+              icon={Lock}
+              autoComplete="current-password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </Field>
           <div className="flex justify-end">
             <button
               type="button"
               onClick={() => setView("forgot-request")}
-              className="text-sm font-semibold text-[var(--color-primary)]"
+              className="text-[13px] font-semibold text-[var(--color-primary)] hover:brightness-110"
             >
-              Forgot Password?
+              Forgot password?
             </button>
           </div>
         </div>
 
         <PrimaryButton
+          className="mt-1"
           type="submit"
           size="lg"
           loading={loading}
@@ -309,8 +281,6 @@ interface ForgotPasswordFlowProps {
   setResetCode: (v: string) => void;
   newPassword: string;
   setNewPassword: (v: string) => void;
-  showNewPassword: boolean;
-  setShowNewPassword: (v: boolean) => void;
   resetLoading: boolean;
   onSendCode: (e: FormEvent) => void;
   onResetPassword: (e: FormEvent) => void;
@@ -326,8 +296,6 @@ function ForgotPasswordFlow({
   setResetCode,
   newPassword,
   setNewPassword,
-  showNewPassword,
-  setShowNewPassword,
   resetLoading,
   onSendCode,
   onResetPassword,
@@ -355,97 +323,57 @@ function ForgotPasswordFlow({
 
       {view === "forgot-request" ? (
         <form onSubmit={onSendCode} className="mt-10 flex w-full flex-col gap-6">
-          <div className="flex flex-col gap-2.5">
-            <label
-              htmlFor="reset-email"
-              className="text-center text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]"
-            >
-              Email Address
-            </label>
-            <GlassCard className="h-16 rounded-[20px] px-4" intensity={30}>
-              <div className="flex h-full items-center gap-4">
-                <Mail className="h-[22px] w-[22px] shrink-0 text-[var(--muted)]" />
-                <input
-                  id="reset-email"
-                  type="email"
-                  inputMode="email"
-                  autoCapitalize="none"
-                  placeholder="name@example.com"
-                  value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
-                  className="h-full w-full min-w-0 bg-transparent text-center text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
-                />
-              </div>
-            </GlassCard>
-          </div>
+          <Field label="Email address" htmlFor="reset-email">
+            <Input
+              id="reset-email"
+              variant="glass"
+              icon={Mail}
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              autoCapitalize="none"
+              placeholder="name@example.com"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+            />
+          </Field>
 
           <PrimaryButton type="submit" size="lg" loading={resetLoading}>
             {resetLoading ? "Sending…" : "Send Reset Code"}
           </PrimaryButton>
         </form>
       ) : (
-        <form onSubmit={onResetPassword} className="mt-10 flex w-full flex-col gap-6">
-          <div className="flex flex-col gap-2.5">
-            <label
-              htmlFor="reset-code"
-              className="text-center text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]"
-            >
-              Reset Code
-            </label>
-            <GlassCard className="h-16 rounded-[20px] px-4" intensity={30}>
-              <div className="flex h-full items-center gap-4">
-                <Lock className="h-[22px] w-[22px] shrink-0 text-[var(--muted)]" />
-                <input
-                  id="reset-code"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  placeholder="6-digit code"
-                  value={resetCode}
-                  onChange={(e) => setResetCode(e.target.value)}
-                  className="h-full w-full min-w-0 bg-transparent text-center text-base tracking-[4px] text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] placeholder:tracking-normal"
-                />
-              </div>
-            </GlassCard>
-          </div>
+        <form onSubmit={onResetPassword} className="mt-10 flex w-full flex-col gap-5">
+          <Field label="Reset code" htmlFor="reset-code">
+            <Input
+              id="reset-code"
+              variant="glass"
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              autoFocus
+              maxLength={6}
+              placeholder="123456"
+              align="center"
+              value={resetCode}
+              onChange={(e) => setResetCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              className="text-[22px] font-bold tracking-[0.4em] placeholder:font-normal placeholder:tracking-[0.2em]"
+            />
+          </Field>
 
-          <div className="flex flex-col gap-2.5">
-            <label
-              htmlFor="new-password"
-              className="text-center text-[13px] font-bold uppercase tracking-wide text-[var(--muted)]"
-            >
-              New Password
-            </label>
-            <GlassCard className="h-16 rounded-[20px] px-4" intensity={30}>
-              <div className="flex h-full items-center gap-4">
-                <Lock className="h-[22px] w-[22px] shrink-0 text-[var(--muted)]" />
-                <input
-                  id="new-password"
-                  type={showNewPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  autoCapitalize="none"
-                  placeholder="Choose a new password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="h-full w-full min-w-0 bg-transparent text-center text-base text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowNewPassword(!showNewPassword)}
-                  className="shrink-0 text-[var(--color-primary)]"
-                  aria-label={showNewPassword ? "Hide password" : "Show password"}
-                >
-                  {showNewPassword ? (
-                    <EyeOff className="h-[22px] w-[22px]" />
-                  ) : (
-                    <Eye className="h-[22px] w-[22px]" />
-                  )}
-                </button>
-              </div>
-            </GlassCard>
-          </div>
+          <Field label="New password" htmlFor="new-password">
+            <PasswordInput
+              id="new-password"
+              variant="glass"
+              icon={Lock}
+              autoComplete="new-password"
+              placeholder="Choose a new password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </Field>
 
-          <PrimaryButton type="submit" size="lg" loading={resetLoading}>
+          <PrimaryButton className="mt-1" type="submit" size="lg" loading={resetLoading}>
             {resetLoading ? "Updating…" : "Reset Password"}
           </PrimaryButton>
         </form>

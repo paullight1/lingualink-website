@@ -3,11 +3,11 @@
 /** Built by Agent 3: 4-slide onboarding carousel (Share Your Voice / Create AI Stories /
  * Preserve Culture / Earn & Learn) shown once to newly-signed-up users. */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ArrowRight, Rocket } from "lucide-react";
-import { GlassCard, PrimaryButton } from "@/components/ui";
+import { GlassCard, PrimaryButton, StepProgress } from "@/components/ui";
 import { Spinner } from "@/components/ui/Skeleton";
 import { cn } from "@/lib/utils";
 import { ONBOARDING_SLIDES, ONBOARDING_STORAGE_KEY } from "./slides";
@@ -91,8 +91,6 @@ export default function OnboardingPage() {
     [step]
   );
 
-  const progressPct = useMemo(() => ((step + 1) / total) * 100, [step, total]);
-
   if (!ready) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -106,30 +104,19 @@ export default function OnboardingPage() {
   return (
     <div className="flex flex-col gap-8">
       {/* Progress + skip */}
-      <div className="flex items-center gap-4">
-        <div className="flex-1">
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[var(--muted)]">
-              Step {step + 1} of {total}
-            </p>
-          </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--input)]">
-            <motion.div
-              className="h-full rounded-full bg-brand-gradient"
-              initial={false}
-              animate={{ width: `${progressPct}%` }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-            />
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={finish}
-          className="shrink-0 text-sm font-semibold text-[var(--muted)] transition-colors hover:text-[var(--foreground)]"
-        >
-          Skip
-        </button>
-      </div>
+      <StepProgress
+        step={step + 1}
+        total={total}
+        action={
+          <button
+            type="button"
+            onClick={finish}
+            className="shrink-0 rounded-full px-2 py-1 text-[13px] font-semibold text-[var(--muted)] transition-colors hover:text-[var(--foreground)]"
+          >
+            Skip
+          </button>
+        }
+      />
 
       {/* Slide content */}
       <AnimatePresence mode="wait" custom={direction}>

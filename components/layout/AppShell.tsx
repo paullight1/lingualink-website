@@ -8,8 +8,11 @@ import {
   Library,
   Bell,
   Menu as MenuIcon,
+  MessageSquare,
+  Gamepad2,
   Plus,
   Trophy,
+  Users,
   Wallet,
   CheckCircle2,
   ListChecks,
@@ -29,14 +32,18 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
+// Bottom tab bar mirrors mobile: Home · Library · [Create] · Chat · Menu.
 const PRIMARY: NavItem[] = [
   { href: "/feed", label: "Home", icon: Home },
   { href: "/library", label: "Library", icon: Library },
-  { href: "/notifications", label: "Notifications", icon: Bell },
+  { href: "/chat", label: "Chats", icon: MessageSquare },
   { href: "/menu", label: "Menu", icon: MenuIcon },
 ];
 
 const SECONDARY: NavItem[] = [
+  { href: "/notifications", label: "Notifications", icon: Bell },
+  { href: "/groups", label: "Groups", icon: Users },
+  { href: "/games", label: "Games", icon: Gamepad2 },
   { href: "/tasks", label: "Tasks", icon: ListChecks },
   { href: "/validate", label: "Validate", icon: CheckCircle2 },
   { href: "/rewards", label: "Wallet", icon: Wallet },

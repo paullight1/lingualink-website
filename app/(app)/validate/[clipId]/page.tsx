@@ -14,7 +14,16 @@ import {
   Globe,
   PartyPopper,
 } from "lucide-react";
-import { AppHeader, WaveformPlayer, PrimaryButton, Spinner, EmptyState } from "@/components/ui";
+import {
+  AppHeader,
+  EmptyState,
+  Field,
+  Input,
+  PrimaryButton,
+  Spinner,
+  Textarea,
+  WaveformPlayer,
+} from "@/components/ui";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { supabase } from "@/lib/supabase/client";
 import { monetizationApi } from "@/lib/api/monetization";
@@ -243,25 +252,30 @@ export default function ValidateClipPage() {
               </div>
             ) : (
               <div className="mt-6 rounded-[18px] border border-[var(--border-light)] bg-[var(--card)] p-4">
-                <p className="mb-2 text-sm font-semibold text-[var(--foreground)]">
-                  {pendingQuality.value === "incorrect"
-                    ? "What's wrong with this clip? (optional)"
-                    : "What could be improved? (optional)"}
-                </p>
-                <textarea
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="e.g. wrong dialect, mispronounced word…"
-                  rows={3}
-                  className="w-full resize-none rounded-2xl border border-[var(--border-light)] bg-[var(--input)] p-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--color-primary)]"
-                />
-                <input
-                  value={correction}
-                  onChange={(e) => setCorrection(e.target.value)}
-                  placeholder="Suggest a correction (optional)"
-                  className="mt-3 w-full rounded-2xl border border-[var(--border-light)] bg-[var(--input)] p-3 text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--muted)] focus:border-[var(--color-primary)]"
-                />
-                <div className="mt-3 grid grid-cols-2 gap-3">
+                <Field
+                  label={
+                    pendingQuality.value === "incorrect"
+                      ? "What's wrong with this clip?"
+                      : "What could be improved?"
+                  }
+                  optional
+                >
+                  <Textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    placeholder="Wrong dialect, mispronounced word…"
+                    rows={3}
+                  />
+                </Field>
+                <Field label="Suggest a correction" optional className="mt-3">
+                  <Input
+                    value={correction}
+                    onChange={(e) => setCorrection(e.target.value)}
+                    size="md"
+                    placeholder="How it should sound or read"
+                  />
+                </Field>
+                <div className="mt-4 grid grid-cols-2 gap-3">
                   <PrimaryButton
                     variant="ghost"
                     disabled={submitting}

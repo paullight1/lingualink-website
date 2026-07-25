@@ -1,13 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Camera, Loader2, X } from "lucide-react";
+import { Camera, Loader2, User } from "lucide-react";
 import toast from "react-hot-toast";
-import { PrimaryButton, UserAvatar } from "@/components/ui";
+import {
+  Field,
+  Input,
+  ModalSheet,
+  PrimaryButton,
+  Textarea,
+  UserAvatar,
+} from "@/components/ui";
 import { supabase } from "@/lib/supabase/client";
 import { uploadAvatar } from "@/lib/storage";
 import { useInvalidateMyProfile } from "@/lib/query/hooks";
 import type { ProfileRow } from "@/lib/types";
+
+const BIO_MAX = 150;
 
 /** Bottom-sheet (mobile) / centered dialog (desktop) to edit full_name, bio & avatar. */
 export function EditProfileModal({
@@ -80,76 +89,64 @@ export function EditProfileModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center sm:p-4"
-      onClick={onClose}
-    >
-      <div
-        className="max-h-[90vh] w-full overflow-y-auto rounded-t-[24px] border border-[var(--border-light)] bg-[var(--card)] p-6 sm:max-w-md sm:rounded-[24px]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-[var(--foreground)]">Edit Profile</h2>
-          <button
-            onClick={onClose}
-            aria-label="Close"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-[var(--muted)] hover:bg-[var(--input)]"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <div className="mb-6 flex flex-col items-center gap-2">
-          <div className="relative">
-            <UserAvatar uri={avatarUrl} name={fullName} size={88} ring />
-            <button
-              onClick={() => fileRef.current?.click()}
-              disabled={uploading}
-              aria-label="Change avatar"
-              className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-brand-gradient text-white shadow-glow disabled:opacity-60"
-            >
-              {uploading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Camera className="h-4 w-4" />
-              )}
-            </button>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => handleAvatarPick(e.target.files?.[0])}
-            />
-          </div>
-        </div>
-
-        <label className="mb-1 block text-xs font-semibold text-[var(--muted)]">
-          Full Name
-        </label>
-        <input
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          placeholder="Your name"
-          className="mb-4 w-full rounded-[12px] border border-[var(--border-light)] bg-[var(--input)] px-4 py-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--color-primary)]"
-        />
-
-        <label className="mb-1 block text-xs font-semibold text-[var(--muted)]">
-          Bio
-        </label>
-        <textarea
-          value={bio}
-          onChange={(e) => setBio(e.target.value.slice(0, 150))}
-          placeholder="Tell us about yourself..."
-          rows={4}
-          className="mb-1 w-full resize-none rounded-[12px] border border-[var(--border-light)] bg-[var(--input)] px-4 py-3 text-sm text-[var(--foreground)] outline-none focus:border-[var(--color-primary)]"
-        />
-        <p className="mb-6 text-right text-xs text-[var(--muted)]">{bio.length}/150</p>
-
+    <ModalSheet
+      onClose={onClose}
+      title="Edit profile"
+      size="md"
+      footer={
         <PrimaryButton onClick={handleSave} loading={saving} disabled={uploading}>
           Save Changes
         </PrimaryButton>
+      }
+    >
+      <div className="mb-6 flex justify-center">
+        <div className="relative">
+          <UserAvatar uri={avatarUrl} name={fullName} size={88} ring />
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={uploading}
+            aria-label="Change avatar"
+            className="absolute bottom-0 right-0 flex h-9 w-9 items-center justify-center rounded-full border-2 border-[var(--surface)] bg-brand-gradient text-white shadow-glow disabled:opacity-60"
+          >
+            {uploading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Camera className="h-4 w-4" />
+            )}
+          </button>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => handleAvatarPick(e.target.files?.[0])}
+          />
+        </div>
       </div>
-    </div>
+
+      <div className="flex flex-col gap-4">
+        <Field label="Full name">
+          <Input
+            icon={User}
+            size="md"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="Your name"
+            autoComplete="name"
+            maxLength={80}
+          />
+        </Field>
+
+        <Field label="Bio" optional counter={{ value: bio.length, max: BIO_MAX }}>
+          <Textarea
+            value={bio}
+            onChange={(e) => setBio(e.target.value.slice(0, BIO_MAX))}
+            placeholder="Tell us about yourself…"
+            rows={4}
+          />
+        </Field>
+      </div>
+    </ModalSheet>
   );
 }

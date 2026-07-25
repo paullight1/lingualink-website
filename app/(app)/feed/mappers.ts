@@ -38,7 +38,8 @@ function mapUser(
     avatar: profile?.avatar_url ?? undefined,
     avatarUrl: profile?.avatar_url ?? undefined,
     language: profile?.primary_language ?? undefined,
-    isVerified: profile?.is_verified ?? undefined,
+    // `profiles` exposes `verified_dialects`, not a boolean `is_verified`.
+    isVerified: (profile?.verified_dialects?.length ?? 0) > 0,
     isFollowing: viewer.followingIds.has(id),
   };
 }
@@ -85,7 +86,7 @@ export function mapVideoClip(
     type: "video",
     user: mapUser(row.user_id, row.profiles, viewer),
     content: {
-      phrase: row.phrase ?? row.caption ?? undefined,
+      phrase: row.phrase ?? undefined,
       translation: row.translation ?? undefined,
       videoUrl: row.video_url,
       videoThumbnail: row.thumbnail_url ?? undefined,
@@ -124,9 +125,9 @@ export function mapStory(
     type: "story",
     user: mapUser(row.user_id, row.profiles, viewer),
     content: {
-      // Mobile falls back to the caption for a story's display text.
-      storyTitle: row.title ?? row.caption ?? undefined,
-      videoThumbnail: row.thumbnail_url ?? row.media_url ?? undefined,
+      // Stories store their text in `caption`, and `media_url` is the poster.
+      storyTitle: row.caption ?? undefined,
+      videoThumbnail: row.media_url ?? undefined,
     },
     engagement: {
       likes: extras.likes_count ?? 0,
