@@ -1,6 +1,13 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 /**
+ * Request gate for the whole app.
+ *
+ * Next 16 renamed the `middleware` file convention to `proxy`; the export is
+ * still a single default function and `config.matcher` is unchanged. The
+ * Clerk helper keeps its own name — only the file convention moved, and
+ * @clerk/nextjs recognises `proxy` on Next 16+.
+ *
  * Public routes: marketing/auth pages. Everything else requires a session.
  */
 const isPublicRoute = createRouteMatcher([
