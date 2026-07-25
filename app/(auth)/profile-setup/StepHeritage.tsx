@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ChevronDown, Plus } from "lucide-react";
 import { Chip } from "@/components/ui";
+import { CountryFlag } from "./CountryFlag";
 import { CountryModal } from "./CountryModal";
 import { COUNTRIES, type Country, type Language } from "./country-data";
 
@@ -83,9 +84,9 @@ export function StepHeritage({
             }
           >
             {country ? (
-              <span className="flex items-center gap-3">
-                <span className="text-2xl leading-none">{country.flag}</span>
-                <span className="font-semibold text-[var(--foreground)]">
+              <span className="flex min-w-0 items-center gap-3">
+                <CountryFlag code={country.code} name={country.name} />
+                <span className="truncate font-semibold text-[var(--foreground)]">
                   {country.name}
                 </span>
               </span>

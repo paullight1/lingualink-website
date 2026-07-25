@@ -28,6 +28,8 @@ import {
   PrimaryButton,
 } from "@/components/ui";
 import { normalizeUsername } from "@/lib/utils";
+import { storePendingReferral } from "@/lib/api/referral";
+import { AppleGlyph, GoogleGlyph } from "../../OAuthGlyphs";
 import { supabase } from "@/lib/supabase/client";
 
 type UsernameStatus = "idle" | "checking" | "available" | "taken" | "short";
@@ -89,7 +91,9 @@ export default function SignUpPage() {
   const [code, setCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [verifying, setVerifying] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  const [oauthPending, setOauthPending] = useState<
+    "oauth_google" | "oauth_apple" | null
+  >(null);
 
   const { normalized: normalizedUsername, status: usernameStatus } =
     useUsernameAvailability(username);
@@ -101,19 +105,25 @@ export default function SignUpPage() {
         ? "Too short"
         : "";
 
-  const handleGoogleSignUp = async () => {
+  const handleOAuthSignUp = async (
+    strategy: "oauth_google" | "oauth_apple"
+  ) => {
     if (!isLoaded) return;
-    setGoogleLoading(true);
+    setOauthPending(strategy);
+    // A code typed before choosing social sign-up still counts — park it so the
+    // post-session redemption picks it up.
+    storePendingReferral(referralCode);
     try {
       await signUp.authenticateWithRedirect({
-        strategy: "oauth_google",
+        strategy,
         redirectUrl: "/sign-up/sso-callback",
         redirectUrlComplete: "/onboarding",
       });
     } catch (err) {
-      console.error("[sign-up] Google OAuth failed:", err);
-      toast.error("Couldn't start Google sign-up. Please try again.");
-      setGoogleLoading(false);
+      console.error(`[sign-up] ${strategy} failed:`, err);
+      const label = strategy === "oauth_apple" ? "Apple" : "Google";
+      toast.error(`Couldn't start ${label} sign-up. Please try again.`);
+      setOauthPending(null);
     }
   };
 
@@ -167,13 +177,31 @@ export default function SignUpPage() {
 
     setSubmitting(true);
     try {
+      // Handles do NOT go to Clerk. The shared instance has the `username`
+      // attribute disabled (user_settings.attributes.username.enabled=false),
+      // so sending one made Clerk reject the whole request and no account was
+      // ever created. The mobile app has always routed the handle through
+      // unsafeMetadata for exactly this reason — the signup webhook reads it
+      // from there — and this now matches.
+      const names = fullName.trim().split(/\s+/);
+      const firstName = names[0] || "User";
+      const lastName = names.slice(1).join(" ") || "LinguaLink";
+      const invite = referralCode.trim();
+
+      // Park the code now; it can only be redeemed once a session exists.
+      storePendingReferral(invite);
+
       await signUp.create({
         emailAddress: email.trim(),
         password,
-        username: normalizedUsername,
+        firstName,
+        lastName,
         unsafeMetadata: {
-          fullName: fullName.trim(),
-          referralCode: referralCode.trim() || undefined,
+          username: normalizedUsername,
+          handle: normalizedUsername, // key older backend flows read
+          full_name: fullName.trim(),
+          invite_code: invite || undefined,
+          invite_code_input: invite || undefined, // backend fallback key
         },
       });
 
@@ -388,21 +416,39 @@ export default function SignUpPage() {
         <div className="h-px flex-1 bg-[var(--border-light)]" />
       </div>
 
-      <GlassCard className="rounded-[28px]" intensity={30}>
-        <button
-          type="button"
-          onClick={handleGoogleSignUp}
-          disabled={submitting || googleLoading}
-          className="flex h-14 w-full items-center justify-center gap-3 font-semibold text-[var(--foreground)] disabled:opacity-60"
-        >
-          {googleLoading ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <GoogleIcon className="h-5 w-5" />
-          )}
-          Continue with Google
-        </button>
-      </GlassCard>
+      <div className="flex flex-col gap-3">
+        <GlassCard className="rounded-[28px]" intensity={30}>
+          <button
+            type="button"
+            onClick={() => handleOAuthSignUp("oauth_google")}
+            disabled={submitting || oauthPending !== null}
+            className="flex h-14 w-full items-center justify-center gap-3 font-semibold text-[var(--foreground)] disabled:opacity-60"
+          >
+            {oauthPending === "oauth_google" ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <GoogleGlyph className="h-5 w-5" />
+            )}
+            Continue with Google
+          </button>
+        </GlassCard>
+
+        <GlassCard className="rounded-[28px]" intensity={30}>
+          <button
+            type="button"
+            onClick={() => handleOAuthSignUp("oauth_apple")}
+            disabled={submitting || oauthPending !== null}
+            className="flex h-14 w-full items-center justify-center gap-3 font-semibold text-[var(--foreground)] disabled:opacity-60"
+          >
+            {oauthPending === "oauth_apple" ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <AppleGlyph className="h-5 w-5" />
+            )}
+            Continue with Apple
+          </button>
+        </GlassCard>
+      </div>
 
       <p className="mt-6 text-center text-sm text-[var(--muted)]">
         Already have an account?{" "}
@@ -428,27 +474,4 @@ function UsernameStatusIcon({ status }: { status: UsernameStatus }) {
     return <X className="h-[18px] w-[18px] text-[var(--error)]" />;
   }
   return null;
-}
-
-function GoogleIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden>
-      <path
-        fill="#4285F4"
-        d="M23.49 12.27c0-.79-.07-1.54-.19-2.27H12v4.51h6.47c-.29 1.48-1.14 2.73-2.4 3.58v2.98h3.88c2.27-2.09 3.54-5.17 3.54-8.8z"
-      />
-      <path
-        fill="#34A853"
-        d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-2.98c-1.08.72-2.45 1.15-4.05 1.15-3.11 0-5.75-2.1-6.69-4.93H1.3v3.09C3.26 21.3 7.31 24 12 24z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M5.31 14.33A7.2 7.2 0 0 1 4.9 12c0-.81.14-1.6.38-2.33V6.58H1.3A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.3 5.42l4.01-3.09z"
-      />
-      <path
-        fill="#EA4335"
-        d="M12 4.75c1.76 0 3.34.61 4.58 1.8l3.44-3.44C17.94 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.3 6.58l4.01 3.09C6.25 6.85 8.89 4.75 12 4.75z"
-      />
-    </svg>
-  );
 }

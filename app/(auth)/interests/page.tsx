@@ -106,7 +106,10 @@ export default function InterestsPage() {
         interests: merged,
         followed_count: toFollow.length,
       });
-      invalidateMyProfile();
+      // Await the refetch: OnboardingGate reads this cache entry, and
+      // navigating while it still holds `has_completed_onboarding: false`
+      // bounces the user straight back to this page.
+      await invalidateMyProfile();
       router.push("/feed");
     } catch (err) {
       console.error("Error finishing interest setup:", err);

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { SearchInput } from "@/components/ui";
+import { CountryFlag } from "./CountryFlag";
 import { cn } from "@/lib/utils";
 import type { Country } from "./country-data";
 
@@ -99,7 +100,7 @@ export function CountryModal({
                     isSelected && "bg-[var(--color-primary)]/10"
                   )}
                 >
-                  <span className="text-2xl leading-none">{c.flag}</span>
+                  <CountryFlag code={c.code} name={c.name} />
                   <span className="flex min-w-0 flex-col">
                     <span
                       className={cn(

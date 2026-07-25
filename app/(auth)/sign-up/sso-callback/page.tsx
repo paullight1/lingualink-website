@@ -11,7 +11,12 @@ export default function SignUpSsoCallbackPage() {
     <div className="flex flex-col items-center gap-4 py-16">
       <Loader2 className="h-8 w-8 animate-spin text-[var(--color-primary)]" />
       <p className="text-sm text-[var(--muted)]">Finishing sign-up...</p>
-      <AuthenticateWithRedirectCallback signUpForceRedirectUrl="/onboarding" />
+      <AuthenticateWithRedirectCallback
+        signUpForceRedirectUrl="/onboarding"
+        // OAuth denial, or an email that already has an account: land the user
+        // somewhere they can act instead of on this spinner forever.
+        signInUrl="/sign-in"
+      />
     </div>
   );
 }

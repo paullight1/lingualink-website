@@ -130,7 +130,9 @@ export default function ProfileSetupPage() {
       );
       if (error) throw error;
 
-      invalidateProfile();
+      // Awaited for the same reason as the interests step — the gate reads
+      // this cache entry to decide where a signed-in user belongs.
+      await invalidateProfile();
       router.push("/interests");
     } catch (err) {
       console.error("Profile setup error:", err);

@@ -17,7 +17,7 @@ import {
   PrimaryButton,
   Spinner,
 } from "@/components/ui";
-import { GoogleGlyph } from "./GoogleGlyph";
+import { AppleGlyph, GoogleGlyph } from "../../OAuthGlyphs";
 
 /** Pull a human-readable message out of a Clerk API error. */
 function clerkErrorMessage(err: unknown, fallback: string): string {
@@ -39,7 +39,10 @@ export default function SignInPage() {
         <p className="text-sm text-[var(--muted)]">Finishing sign in…</p>
         <AuthenticateWithRedirectCallback
           signInForceRedirectUrl="/feed"
-          signUpForceRedirectUrl="/feed"
+          // "Continue with Google" on the sign-in page is also how a brand-new
+          // user arrives — Clerk transfers the attempt to a sign-up. They must
+          // start at onboarding, not at a feed with no profile row behind it.
+          signUpForceRedirectUrl="/onboarding"
         />
       </div>
     );
@@ -58,7 +61,9 @@ function SignInFlow() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  const [oauthPending, setOauthPending] = useState<
+    "oauth_google" | "oauth_apple" | null
+  >(null);
 
   // forgot-password fields
   const [resetEmail, setResetEmail] = useState("");
@@ -66,7 +71,7 @@ function SignInFlow() {
   const [newPassword, setNewPassword] = useState("");
   const [resetLoading, setResetLoading] = useState(false);
 
-  const disabled = loading || googleLoading;
+  const disabled = loading || oauthPending !== null;
 
   const handleSignIn = async (e: FormEvent) => {
     e.preventDefault();
@@ -97,18 +102,22 @@ function SignInFlow() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
+  /** Both providers the Clerk instance enables (oauth_google, oauth_apple). */
+  const handleOAuth = async (strategy: "oauth_google" | "oauth_apple") => {
     if (!isLoaded) return;
-    setGoogleLoading(true);
+    setOauthPending(strategy);
     try {
       await signIn.authenticateWithRedirect({
-        strategy: "oauth_google",
+        strategy,
         redirectUrl: "/sign-in/sso-callback",
         redirectUrlComplete: "/feed",
       });
     } catch (err) {
-      setGoogleLoading(false);
-      toast.error(clerkErrorMessage(err, "Google sign in failed. Please try again."));
+      setOauthPending(null);
+      const label = strategy === "oauth_apple" ? "Apple" : "Google";
+      toast.error(
+        clerkErrorMessage(err, `${label} sign in failed. Please try again.`)
+      );
     }
   };
 
@@ -249,19 +258,39 @@ function SignInFlow() {
         <div className="h-px flex-1 bg-[var(--border-light)]" />
       </div>
 
-      <GlassCard className="mt-6 h-14 w-full rounded-[28px]" intensity={30}>
-        <button
-          type="button"
-          onClick={handleGoogleSignIn}
-          disabled={disabled}
-          className="flex h-full w-full items-center justify-center gap-3 disabled:opacity-60"
-        >
-          <GoogleGlyph className="h-[22px] w-[22px]" />
-          <span className="text-[15px] font-bold text-[var(--foreground)]">
-            {googleLoading ? "Connecting…" : "Continue with Google"}
-          </span>
-        </button>
-      </GlassCard>
+      <div className="mt-6 flex w-full flex-col gap-3">
+        <GlassCard className="h-14 w-full rounded-[28px]" intensity={30}>
+          <button
+            type="button"
+            onClick={() => handleOAuth("oauth_google")}
+            disabled={disabled}
+            className="flex h-full w-full items-center justify-center gap-3 disabled:opacity-60"
+          >
+            <GoogleGlyph className="h-[22px] w-[22px]" />
+            <span className="text-[15px] font-bold text-[var(--foreground)]">
+              {oauthPending === "oauth_google"
+                ? "Connecting…"
+                : "Continue with Google"}
+            </span>
+          </button>
+        </GlassCard>
+
+        <GlassCard className="h-14 w-full rounded-[28px]" intensity={30}>
+          <button
+            type="button"
+            onClick={() => handleOAuth("oauth_apple")}
+            disabled={disabled}
+            className="flex h-full w-full items-center justify-center gap-3 disabled:opacity-60"
+          >
+            <AppleGlyph className="h-[22px] w-[22px]" />
+            <span className="text-[15px] font-bold text-[var(--foreground)]">
+              {oauthPending === "oauth_apple"
+                ? "Connecting…"
+                : "Continue with Apple"}
+            </span>
+          </button>
+        </GlassCard>
+      </div>
 
       <p className="mt-6 text-sm text-[var(--muted)]">
         Don&apos;t have an account?{" "}

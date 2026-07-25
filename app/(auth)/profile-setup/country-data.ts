@@ -13,8 +13,8 @@ export interface Language {
 
 export interface Country {
   name: string;
-  code: string; // ISO 3166-1 alpha-2
-  flag: string; // emoji flag
+  /** ISO 3166-1 alpha-2 — also what CountryFlag maps to a bundled SVG. */
+  code: string;
   languages: Language[];
 }
 
@@ -22,7 +22,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "Nigeria",
     code: "NG",
-    flag: "🇳🇬",
     languages: [
       { name: "English", code: "en" },
       { name: "Hausa", code: "ha", nativeName: "Harshen Hausa" },
@@ -39,7 +38,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "Cameroon",
     code: "CM",
-    flag: "🇨🇲",
     languages: [
       { name: "French", code: "fr" },
       { name: "English", code: "en" },
@@ -52,7 +50,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "Ghana",
     code: "GH",
-    flag: "🇬🇭",
     languages: [
       { name: "English", code: "en" },
       { name: "Twi", code: "aka" },
@@ -65,7 +62,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "Kenya",
     code: "KE",
-    flag: "🇰🇪",
     languages: [
       { name: "Swahili", code: "sw" },
       { name: "English", code: "en" },
@@ -78,7 +74,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "South Africa",
     code: "ZA",
-    flag: "🇿🇦",
     languages: [
       { name: "Zulu", code: "zu" },
       { name: "Xhosa", code: "xh" },
@@ -91,7 +86,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "DR Congo",
     code: "CD",
-    flag: "🇨🇩",
     languages: [
       { name: "French", code: "fr" },
       { name: "Lingala", code: "ln" },
@@ -103,7 +97,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "China",
     code: "CN",
-    flag: "🇨🇳",
     languages: [
       { name: "Mandarin", code: "zh", nativeName: "普通话" },
       { name: "Cantonese", code: "yue", nativeName: "广东话" },
@@ -116,7 +109,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "India",
     code: "IN",
-    flag: "🇮🇳",
     languages: [
       { name: "Hindi", code: "hi" },
       { name: "English", code: "en" },
@@ -131,7 +123,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "Indonesia",
     code: "ID",
-    flag: "🇮🇩",
     languages: [
       { name: "Indonesian", code: "id" },
       { name: "Javanese", code: "jv" },
@@ -143,7 +134,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "Philippines",
     code: "PH",
-    flag: "🇵🇭",
     languages: [
       { name: "Filipino", code: "fil" },
       { name: "Tagalog", code: "tl" },
@@ -155,7 +145,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "Mexico",
     code: "MX",
-    flag: "🇲🇽",
     languages: [
       { name: "Spanish", code: "es" },
       { name: "Nahuatl", code: "nah" },
@@ -167,7 +156,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "Brazil",
     code: "BR",
-    flag: "🇧🇷",
     languages: [
       { name: "Portuguese", code: "pt" },
       { name: "Nheengatu", code: "yrl" },
@@ -178,7 +166,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "United States",
     code: "US",
-    flag: "🇺🇸",
     languages: [
       { name: "English", code: "en" },
       { name: "Spanish", code: "es" },
@@ -190,7 +177,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "United Kingdom",
     code: "GB",
-    flag: "🇬🇧",
     languages: [
       { name: "English", code: "en" },
       { name: "Welsh", code: "cy" },
@@ -201,7 +187,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "Vietnam",
     code: "VN",
-    flag: "🇻🇳",
     languages: [
       { name: "Vietnamese", code: "vi" },
       { name: "Tay", code: "tyz" },
@@ -212,7 +197,6 @@ export const COUNTRIES: Country[] = [
   {
     name: "Japan",
     code: "JP",
-    flag: "🇯🇵",
     languages: [
       { name: "Japanese", code: "ja" },
       { name: "Ryukyuan", code: "ryu" },
