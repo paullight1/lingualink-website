@@ -3,11 +3,11 @@
 /** Branded custom sign-in: email/password + Google OAuth via useSignIn(),
  *  self-contained forgot-password flow, ported from mobile SignInScreen/ModernAuthLanding. */
 
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSignIn, AuthenticateWithRedirectCallback } from "@clerk/nextjs";
-import { Mail, Lock, LogIn, ChevronLeft } from "lucide-react";
+import { Mail, Lock, LogIn, ChevronLeft, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import {
   Field,
@@ -193,15 +193,15 @@ function SignInFlow() {
   }
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="w-full">
       <h1 className="text-center text-3xl font-extrabold tracking-tight text-[var(--foreground)] sm:text-4xl">
-        Welcome <span className="text-[var(--color-primary)]">Back</span>
+        Welcome <span className="text-brand-gradient">Back</span>
       </h1>
-      <p className="mt-2 text-center text-[var(--muted)]">
+      <p className="mt-2 text-center text-sm text-[var(--muted)]">
         Continue your legacy of language preservation.
       </p>
 
-      <form onSubmit={handleSignIn} className="mt-10 flex w-full flex-col gap-5">
+      <form onSubmit={handleSignIn} className="mt-8 flex flex-col gap-5">
         <Field label="Email address" htmlFor="sign-in-email">
           <Input
             id="sign-in-email"
@@ -217,19 +217,10 @@ function SignInFlow() {
           />
         </Field>
 
-        <div className="flex flex-col gap-2">
-          <Field label="Password" htmlFor="sign-in-password">
-            <PasswordInput
-              id="sign-in-password"
-              variant="glass"
-              icon={Lock}
-              autoComplete="current-password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Field>
-          <div className="flex justify-end">
+        <Field
+          label="Password"
+          htmlFor="sign-in-password"
+          action={
             <button
               type="button"
               onClick={() => setView("forgot-request")}
@@ -237,8 +228,18 @@ function SignInFlow() {
             >
               Forgot password?
             </button>
-          </div>
-        </div>
+          }
+        >
+          <PasswordInput
+            id="sign-in-password"
+            variant="glass"
+            icon={Lock}
+            autoComplete="current-password"
+            placeholder="Enter your password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </Field>
 
         <PrimaryButton
           className="mt-1"
@@ -252,53 +253,67 @@ function SignInFlow() {
         </PrimaryButton>
       </form>
 
-      <div className="mt-8 flex w-full items-center gap-3">
+      <div className="my-6 flex items-center gap-3">
         <div className="h-px flex-1 bg-[var(--border-light)]" />
-        <span className="text-[11px] tracking-[2px] text-[var(--muted)]">OR</span>
+        <span className="text-xs tracking-widest text-[var(--muted)]">OR</span>
         <div className="h-px flex-1 bg-[var(--border-light)]" />
       </div>
 
-      <div className="mt-6 flex w-full flex-col gap-3">
-        <GlassCard className="h-14 w-full rounded-[28px]" intensity={30}>
-          <button
-            type="button"
-            onClick={() => handleOAuth("oauth_google")}
-            disabled={disabled}
-            className="flex h-full w-full items-center justify-center gap-3 disabled:opacity-60"
-          >
-            <GoogleGlyph className="h-[22px] w-[22px]" />
-            <span className="text-[15px] font-bold text-[var(--foreground)]">
-              {oauthPending === "oauth_google"
-                ? "Connecting…"
-                : "Continue with Google"}
-            </span>
-          </button>
-        </GlassCard>
-
-        <GlassCard className="h-14 w-full rounded-[28px]" intensity={30}>
-          <button
-            type="button"
-            onClick={() => handleOAuth("oauth_apple")}
-            disabled={disabled}
-            className="flex h-full w-full items-center justify-center gap-3 disabled:opacity-60"
-          >
-            <AppleGlyph className="h-[22px] w-[22px]" />
-            <span className="text-[15px] font-bold text-[var(--foreground)]">
-              {oauthPending === "oauth_apple"
-                ? "Connecting…"
-                : "Continue with Apple"}
-            </span>
-          </button>
-        </GlassCard>
+      <div className="flex flex-col gap-3">
+        <OAuthButton
+          glyph={<GoogleGlyph className="h-5 w-5" />}
+          label="Continue with Google"
+          pending={oauthPending === "oauth_google"}
+          disabled={disabled}
+          onClick={() => handleOAuth("oauth_google")}
+        />
+        <OAuthButton
+          glyph={<AppleGlyph className="h-5 w-5" />}
+          label="Continue with Apple"
+          pending={oauthPending === "oauth_apple"}
+          disabled={disabled}
+          onClick={() => handleOAuth("oauth_apple")}
+        />
       </div>
 
-      <p className="mt-6 text-sm text-[var(--muted)]">
+      <p className="mt-6 text-center text-sm text-[var(--muted)]">
         Don&apos;t have an account?{" "}
         <Link href="/sign-up" className="font-extrabold text-[var(--color-primary)]">
           Sign Up
         </Link>
       </p>
     </div>
+  );
+}
+
+interface OAuthButtonProps {
+  glyph: ReactNode;
+  label: string;
+  pending: boolean;
+  disabled: boolean;
+  onClick: () => void;
+}
+
+/**
+ * Social pill matching the field stack's width and 56px rhythm.
+ * The height lives on the <button>, not on the GlassCard: the card wraps its
+ * children in an auto-height element, so `h-full` on the button would resolve
+ * against `auto` and collapse the label to the top of the pill.
+ */
+function OAuthButton({ glyph, label, pending, disabled, onClick }: OAuthButtonProps) {
+  return (
+    <GlassCard className="rounded-[28px]" intensity={30}>
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        aria-busy={pending}
+        className="flex h-14 w-full items-center justify-center gap-3 px-4 text-[15px] font-semibold text-[var(--foreground)] transition-opacity disabled:opacity-60"
+      >
+        {pending ? <Loader2 className="h-5 w-5 animate-spin" /> : glyph}
+        {pending ? "Connecting…" : label}
+      </button>
+    </GlassCard>
   );
 }
 
@@ -331,11 +346,11 @@ function ForgotPasswordFlow({
   onBack,
 }: ForgotPasswordFlowProps) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="w-full">
       <button
         type="button"
         onClick={onBack}
-        className="mb-6 flex h-11 w-11 items-center justify-center self-start rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] text-[var(--foreground)]"
+        className="mb-6 flex h-11 w-11 items-center justify-center rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] text-[var(--foreground)] transition-colors hover:border-[var(--field-border-hover)]"
         aria-label="Back to sign in"
       >
         <ChevronLeft className="h-6 w-6" />
@@ -344,14 +359,14 @@ function ForgotPasswordFlow({
       <h1 className="text-center text-2xl font-extrabold tracking-tight text-[var(--foreground)] sm:text-3xl">
         {view === "forgot-request" ? "Reset your password" : "Check your email"}
       </h1>
-      <p className="mt-2 text-center text-[var(--muted)]">
+      <p className="mt-2 text-center text-sm text-[var(--muted)]">
         {view === "forgot-request"
           ? "Enter the email tied to your account and we'll send you a reset code."
           : `Enter the code we sent to ${resetEmail || "your email"}, plus a new password.`}
       </p>
 
       {view === "forgot-request" ? (
-        <form onSubmit={onSendCode} className="mt-10 flex w-full flex-col gap-6">
+        <form onSubmit={onSendCode} className="mt-8 flex flex-col gap-5">
           <Field label="Email address" htmlFor="reset-email">
             <Input
               id="reset-email"
@@ -367,12 +382,12 @@ function ForgotPasswordFlow({
             />
           </Field>
 
-          <PrimaryButton type="submit" size="lg" loading={resetLoading}>
+          <PrimaryButton className="mt-1" type="submit" size="lg" loading={resetLoading}>
             {resetLoading ? "Sending…" : "Send Reset Code"}
           </PrimaryButton>
         </form>
       ) : (
-        <form onSubmit={onResetPassword} className="mt-10 flex w-full flex-col gap-5">
+        <form onSubmit={onResetPassword} className="mt-8 flex flex-col gap-5">
           <Field label="Reset code" htmlFor="reset-code">
             <Input
               id="reset-code"

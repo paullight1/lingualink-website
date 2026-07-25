@@ -54,10 +54,32 @@ const useIsomorphicLayoutEffect =
 /* Shared shell                                                        */
 /* ------------------------------------------------------------------ */
 
+/**
+ * `suffixBtn` keeps a trailing icon *button* optically aligned with the
+ * leading icon. A centred glyph sits `(button - icon) / 2` inside its own box,
+ * so the button is pulled right by exactly that much: the trailing glyph then
+ * lands on the same inset as `box`'s horizontal padding, mirroring the icon on
+ * the left instead of floating a few px short of it.
+ */
 const SIZE = {
-  sm: { box: "h-10 gap-2 px-3", text: "text-[14px]", icon: "h-4 w-4" },
-  md: { box: "h-12 gap-2.5 px-3.5", text: "text-[15px]", icon: "h-[18px] w-[18px]" },
-  lg: { box: "h-14 gap-3 px-4", text: "text-[15px]", icon: "h-5 w-5" },
+  sm: {
+    box: "h-10 gap-2 px-3",
+    text: "text-[14px]",
+    icon: "h-4 w-4",
+    suffixBtn: "h-8 w-8 -mr-2", // (32-16)/2 = 8
+  },
+  md: {
+    box: "h-12 gap-2.5 px-3.5",
+    text: "text-[15px]",
+    icon: "h-[18px] w-[18px]",
+    suffixBtn: "h-9 w-9 -mr-[9px]", // (36-18)/2 = 9
+  },
+  lg: {
+    box: "h-14 gap-3 px-4",
+    text: "text-[15px]",
+    icon: "h-5 w-5",
+    suffixBtn: "h-10 w-10 -mr-2.5", // (40-20)/2 = 10
+  },
 } as const;
 
 /** Border + background + focus ring shared by input, textarea and select. */
@@ -93,6 +115,13 @@ export interface FieldProps {
   error?: string;
   /** Live character count, right-aligned on the label row. */
   counter?: { value: number; max: number };
+  /**
+   * Inline control on the label row, opposite the label — e.g. a
+   * "Forgot password?" link. Belongs here rather than under the control, where
+   * it would sit at the same 8px offset the label uses and read as a caption
+   * for the field below it. Ignored when `counter` is set.
+   */
+  action?: ReactNode;
   /** Override the generated id (must match the control's own `id`). */
   htmlFor?: string;
   className?: string;
@@ -105,6 +134,7 @@ export function Field({
   optional,
   error,
   counter,
+  action,
   htmlFor,
   className,
   children,
@@ -119,7 +149,7 @@ export function Field({
       value={{ id, describedBy: messageId, invalid: Boolean(error) }}
     >
       <div className={cn("flex w-full flex-col gap-2", className)}>
-        {(label || counter) && (
+        {(label || counter || action) && (
           <div className="flex items-baseline justify-between gap-3">
             {label ? (
               <label
@@ -136,7 +166,7 @@ export function Field({
             ) : (
               <span />
             )}
-            {counter && (
+            {counter ? (
               <span
                 className={cn(
                   "shrink-0 text-[11px] font-medium tabular-nums leading-none",
@@ -145,7 +175,9 @@ export function Field({
               >
                 {counter.value}/{counter.max}
               </span>
-            )}
+            ) : action ? (
+              <span className="shrink-0 leading-none">{action}</span>
+            ) : null}
           </div>
         )}
 
@@ -270,6 +302,11 @@ export const PasswordInput = forwardRef<
   Omit<InputProps, "type" | "suffix">
 >(function PasswordInput(props, ref) {
   const [visible, setVisible] = useState(false);
+  // The reveal glyph has to match the leading icon's size and inset, or the two
+  // ends of the same bar read as different fields.
+  const s = SIZE[props.size ?? "lg"];
+  const Glyph = visible ? EyeOff : Eye;
+
   return (
     <Input
       ref={ref}
@@ -284,9 +321,13 @@ export const PasswordInput = forwardRef<
           tabIndex={-1}
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Hide password" : "Show password"}
-          className="-mr-1 flex h-8 w-8 items-center justify-center rounded-full text-[var(--muted-2)] transition-colors hover:text-[var(--color-primary)]"
+          aria-pressed={visible}
+          className={cn(
+            "flex items-center justify-center rounded-full text-[var(--muted-2)] transition-colors hover:text-[var(--color-primary)]",
+            s.suffixBtn
+          )}
         >
-          {visible ? <EyeOff className="h-[18px] w-[18px]" /> : <Eye className="h-[18px] w-[18px]" />}
+          <Glyph className={s.icon} />
         </button>
       }
     />
