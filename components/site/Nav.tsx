@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { List, X } from "@phosphor-icons/react/dist/ssr";
 import { Logo } from "./Logo";
+import { appUrl } from "@/lib/site-urls";
 
 const links = [
   { href: "/#how", label: "How it works" },
@@ -12,7 +13,6 @@ const links = [
   { href: "/faq", label: "FAQ" },
 ];
 
-const appUrl = process.env.NEXT_PUBLIC_WEB_APP_URL ?? "http://localhost:3000";
 
 export function Nav() {
   const [open, setOpen] = useState(false);

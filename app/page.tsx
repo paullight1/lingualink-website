@@ -10,8 +10,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import heroImg from "@/public/images/hero.jpg";
 import recordImg from "@/public/images/record.jpg";
-
-const appUrl = process.env.NEXT_PUBLIC_WEB_APP_URL ?? "http://localhost:3000";
+import { appUrl } from "@/lib/site-urls";
 
 const authLinks = {
   signUp: `${appUrl}/sign-up`,

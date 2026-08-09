@@ -1,6 +1,5 @@
 import { Reveal } from "./Reveal";
-
-const appUrl = process.env.NEXT_PUBLIC_WEB_APP_URL ?? "http://localhost:3000";
+import { appUrl } from "@/lib/site-urls";
 
 /* The one deliberate dark band on each page: final download call to action. */
 export function DarkCta() {

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
-
-const appUrl = process.env.NEXT_PUBLIC_WEB_APP_URL ?? "http://localhost:3000";
+import { adminPortalUrl, appUrl } from "@/lib/site-urls";
 
 const columns = [
   {
@@ -62,6 +61,14 @@ export function Footer() {
         <div className="mt-12 flex flex-col gap-2 border-t border-line pt-6 text-[13px] text-ink-soft sm:flex-row sm:items-center sm:justify-between">
           <p>© 2026 LinguaLink. Made with love for African languages.</p>
           <p>
+            <a
+              href={adminPortalUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mr-5 font-semibold text-brand-text underline underline-offset-2 hover:text-brand-deep"
+            >
+              Admin login
+            </a>
             Photos by generous photographers on{" "}
             <a
               href="https://unsplash.com"
