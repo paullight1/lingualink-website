@@ -1,4 +1,4 @@
-const productionAppUrl = "https://lingualink-website.vercel.app";
+const productionAppUrl = "https://lingualink-web-app.vercel.app";
 const localAppUrl = "http://localhost:3000";
 
 function isLocalUrl(value: string) {
