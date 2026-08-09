@@ -9,9 +9,10 @@ import { Logo } from "./Logo";
 const links = [
   { href: "/#how", label: "How it works" },
   { href: "/about", label: "About" },
-  { href: "/blog", label: "Blog" },
   { href: "/faq", label: "FAQ" },
 ];
+
+const appUrl = process.env.NEXT_PUBLIC_WEB_APP_URL ?? "http://localhost:3000";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
@@ -35,10 +36,10 @@ export function Nav() {
             </Link>
           ))}
           <Link
-            href="/#get"
-            className="rounded-full bg-gradient-to-br from-brand to-brand-deep px-5 py-2.5 text-[15px] font-semibold text-ink transition-transform hover:-translate-y-px active:scale-[0.98]"
+            href={`${appUrl}/sign-up`}
+            className="rounded-full bg-brand px-5 py-2.5 text-[15px] font-semibold text-ink transition-transform hover:-translate-y-px active:scale-[0.98]"
           >
-            Get the app
+            Join LinguaLink
           </Link>
         </nav>
 
@@ -69,11 +70,11 @@ export function Nav() {
             </Link>
           ))}
           <Link
-            href="/#get"
+            href={`${appUrl}/sign-up`}
             onClick={() => setOpen(false)}
             className="mt-5 block rounded-full bg-gradient-to-br from-brand to-brand-deep px-5 py-3.5 text-center text-[16px] font-semibold text-ink"
           >
-            Get the app
+            Join LinguaLink
           </Link>
         </nav>
       )}

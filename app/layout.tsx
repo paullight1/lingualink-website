@@ -13,15 +13,15 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   metadataBase: new URL("https://lingualink.app"),
   title: {
-    default: "LinguaLink | Speak your language. Get paid for it.",
+    default: "LinguaLink | Put your language on the record.",
     template: "%s | LinguaLink",
   },
   description:
-    "LinguaLink pays you to record short phrases in Yoruba, Igbo, Hausa and more. Every clip helps keep African languages alive.",
+    "LinguaLink turns everyday speech in African languages into useful voice data and puts value back in the hands of the people who speak it.",
   openGraph: {
     title: "LinguaLink",
     description:
-      "Record short phrases in your language. Earn real money. Keep your language alive.",
+      "Record everyday speech in African languages, contribute to better voice technology, and earn for your contribution.",
     images: ["/images/hero.jpg"],
     type: "website",
   },

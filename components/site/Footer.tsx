@@ -1,13 +1,15 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
 
+const appUrl = process.env.NEXT_PUBLIC_WEB_APP_URL ?? "http://localhost:3000";
+
 const columns = [
   {
     title: "Product",
     links: [
       { href: "/#how", label: "How it works" },
       { href: "/faq", label: "FAQ" },
-      { href: "/blog", label: "Blog" },
+      { href: `${appUrl}/sign-in`, label: "Log in" },
     ],
   },
   {
@@ -34,8 +36,7 @@ export function Footer() {
           <div className="md:col-span-5">
             <Logo />
             <p className="mt-4 max-w-[38ch] text-[15px] leading-relaxed text-ink-soft">
-              Record short phrases in your language. Earn real money. Keep your
-              language alive for the next generation.
+              Record the language you know. Add value to the voice data future.
             </p>
           </div>
           {columns.map((col) => (

@@ -12,7 +12,7 @@
   --color-ink: #221b14;
   --color-ink-soft: #5f564b;
   --color-line: #ece2d6;
-  --color-brand: #ff8a00;
+  --color-brand: #ff9d2e;
   --color-brand-deep: #ff5f00;
   --color-brand-text: #b0470a;
   --color-night: #1d150e;
@@ -81,6 +81,15 @@ p {
   .rise {
     animation: rise-in 0.7s var(--ease-out-quint) both;
   }
+
+  @keyframes illustration-drift {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(1deg); }
+  }
+
+  .illustration-float-one { animation: illustration-drift 5s ease-in-out infinite; transform-origin: center; }
+  .illustration-float-two { animation: illustration-drift 6.5s ease-in-out .2s infinite; transform-origin: center; }
+  .illustration-float-three { animation: illustration-drift 5.5s ease-in-out .5s infinite; transform-origin: center; }
 
   @supports (animation-timeline: view()) {
     .reveal {
