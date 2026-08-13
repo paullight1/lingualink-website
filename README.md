@@ -9,6 +9,11 @@ underrepresented languages. Built to mirror the mobile app's core experience and
 Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · Clerk (auth) ·
 Supabase (DB/Storage/realtime) · TanStack Query · framer-motion · lucide-react · PostHog.
 
+This is the single deployable LinguaLink application. It serves the public marketing site
+(`/`, `/about`, `/blog`, `/faq`, `/contact`, `/privacy`, `/terms`), Clerk auth
+(`/sign-up`, `/sign-in`), and the authenticated product (`/feed` and the rest of the app)
+from one Next.js deployment.
+
 ## Getting started
 
 ```bash
@@ -16,7 +21,7 @@ cd web-app
 npm install
 # .env.local is already populated with the same public keys as the mobile app.
 # (Copy .env.local.example if you need to recreate it.)
-npm run dev        # http://localhost:3000
+npm run dev        # http://localhost:3000 (landing -> auth -> product)
 npm run build      # production build
 npm run typecheck  # tsc --noEmit
 ```

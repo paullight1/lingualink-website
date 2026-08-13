@@ -61,6 +61,22 @@
 
   /* Brand gradient + glow */
   --shadow-glow: 0 8px 24px rgba(255, 138, 0, 0.3);
+
+  /* Marketing-site tokens. Scoped visually by .marketing-site. */
+  --color-bg: #ffffff;
+  --color-tint: #fff6ec;
+  --color-tint-deep: #ffe9d2;
+  --color-ink: #221b14;
+  --color-ink-soft: #5f564b;
+  --color-line: #ece2d6;
+  --color-brand: #ff9d2e;
+  --color-brand-deep: #ff5f00;
+  --color-brand-text: #b0470a;
+  --color-night: #1d150e;
+  --color-night-soft: #cdbfae;
+  --color-night-line: #3a2f24;
+  --radius-card: 16px;
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Light theme (default) */
@@ -249,6 +265,84 @@
     background: var(--border-light);
     border-radius: 9999px;
   }
+}
+
+/* Public marketing pages share the website design system without changing the app shell. */
+.marketing-site {
+  --marketing-bg: #ffffff;
+  --marketing-tint: #fff6ec;
+  --marketing-ink: #221b14;
+  --marketing-ink-soft: #5f564b;
+  --marketing-line: #ece2d6;
+  --marketing-brand: #ff9d2e;
+  --marketing-brand-deep: #ff5f00;
+  --marketing-brand-text: #b0470a;
+  --marketing-night: #1d150e;
+  --marketing-night-soft: #cdbfae;
+  background: var(--marketing-bg);
+  color: var(--marketing-ink);
+  font-family: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.marketing-site h1,
+.marketing-site h2,
+.marketing-site h3 {
+  text-wrap: balance;
+}
+
+.marketing-site p {
+  text-wrap: pretty;
+}
+
+.marketing-site ::selection {
+  background: var(--marketing-brand);
+  color: var(--marketing-ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes marketing-rise-in {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .marketing-site .rise {
+    animation: marketing-rise-in 0.7s var(--ease-out-quint) both;
+  }
+
+  @keyframes marketing-illustration-drift {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(1deg); }
+  }
+
+  .marketing-site .illustration-float-one { animation: marketing-illustration-drift 5s ease-in-out infinite; transform-origin: center; }
+  .marketing-site .illustration-float-two { animation: marketing-illustration-drift 6.5s ease-in-out .2s infinite; transform-origin: center; }
+  .marketing-site .illustration-float-three { animation: marketing-illustration-drift 5.5s ease-in-out .5s infinite; transform-origin: center; }
+
+  @supports (animation-timeline: view()) {
+    .marketing-site .reveal {
+      animation: marketing-rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 45%;
+    }
+  }
+}
+
+.marketing-site details[open] .faq-chevron {
+  transform: rotate(180deg);
+}
+
+.marketing-site details summary::-webkit-details-marker {
+  display: none;
+}
+
+.marketing-site a:focus-visible,
+.marketing-site button:focus-visible,
+.marketing-site summary:focus-visible {
+  outline: 2px solid var(--marketing-brand-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 @layer utilities {
