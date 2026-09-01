@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { adminPortalUrl } from "@/lib/site-urls";
 import { Logo } from "./Logo";
 
 const footerLinks = [
@@ -28,6 +29,12 @@ export function Footer() {
               {link.label}
             </Link>
           ))}
+          <a
+            href={adminPortalUrl}
+            className="transition hover:text-[#FF8201]"
+          >
+            Admin login
+          </a>
         </nav>
 
         <a

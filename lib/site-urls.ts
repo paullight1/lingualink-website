@@ -5,4 +5,4 @@
 export const appUrl = "";
 export const adminPortalUrl =
   process.env.NEXT_PUBLIC_ADMIN_PORTAL_URL?.trim().replace(/\/+$/, "") ??
-  "/sign-in";
+  "https://admin.lingualink.ai/login";
