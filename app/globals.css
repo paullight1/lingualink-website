@@ -286,6 +286,16 @@
   -webkit-font-smoothing: antialiased;
 }
 
+@media (max-width: 639px) {
+  .marketing-site section {
+    padding-block: 4rem;
+  }
+
+  .marketing-site #home {
+    padding-top: 6rem;
+  }
+}
+
 .marketing-site h1,
 .marketing-site h2,
 .marketing-site h3 {
@@ -343,6 +353,11 @@
   outline: 2px solid var(--marketing-brand-deep);
   outline-offset: 3px;
   border-radius: 4px;
+}
+
+.marketing-site a,
+.marketing-site button {
+  touch-action: manipulation;
 }
 
 @layer utilities {

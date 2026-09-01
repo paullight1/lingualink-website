@@ -25,7 +25,6 @@ export const viewport: Viewport = {
   themeColor: "#1A0800",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 };
 
 // Avoid theme flash: set the .dark class before hydration based on stored pref.

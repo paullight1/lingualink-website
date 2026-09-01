@@ -1,160 +1,192 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import { Reveal } from "@/components/site/Reveal";
-import { DarkCta } from "@/components/site/DarkCta";
-import aboutHero from "@/public/images/about-hero.jpg";
-import aboutPeople from "@/public/images/about-people.jpg";
+import {
+  ArrowRight,
+  CheckCircle,
+  GlobeHemisphereWest,
+  Heart,
+  Microphone,
+  ShieldCheck,
+  UsersThree,
+} from "@phosphor-icons/react/dist/ssr";
+import { appUrl } from "@/lib/site-urls";
 
 export const metadata: Metadata = {
-  title: "About",
+  title: "About LinguaLink",
   description:
-    "LinguaLink exists so African languages thrive in the digital age. Learn who we are and why we built the app.",
+    "Learn why LinguaLink is building a more inclusive voice future for African languages.",
 };
 
-const beliefs = [
+const principles = [
   {
-    title: "Languages are libraries",
-    text: "Every language holds songs, jokes, medicine and history. When one goes quiet, all of that goes with it. We think that loss is preventable.",
+    icon: GlobeHemisphereWest,
+    title: "Every language matters",
+    text: "A language carries memory, humour, knowledge, and belonging. We build tools that help it stay visible.",
+    tone: "bg-orange-50 text-orange-600",
   },
   {
-    title: "Speakers should be paid",
-    text: "Big companies build voice technology from data. The people who provide that data deserve a fair share, paid openly and on time.",
+    icon: Heart,
+    title: "Speakers deserve value",
+    text: "The people who contribute language data should understand its value and share in what it creates.",
+    tone: "bg-purple-50 text-purple-600",
   },
   {
-    title: "Built for real phones",
-    text: "Our users are not on the newest devices. The app runs light, works offline, and respects a small data bundle. That is a feature, not an afterthought.",
+    icon: ShieldCheck,
+    title: "Trust is the foundation",
+    text: "Community review, clear rules, and privacy keep every recording useful and respectful.",
+    tone: "bg-emerald-50 text-emerald-600",
   },
 ];
 
+const commitments = [
+  "Simple tools for everyday phones",
+  "Community-led language validation",
+  "Clear ownership and privacy choices",
+  "Fair rewards for useful contributions",
+];
+
+function AboutIllustration() {
+  return (
+    <div className="relative mx-auto aspect-square w-full max-w-[460px]">
+      <div className="absolute inset-8 rounded-full bg-gradient-to-br from-orange-200 via-amber-50 to-purple-200 blur-2xl" />
+      <div className="absolute inset-10 rounded-[3rem] border-2 border-orange-200 bg-white/80 shadow-xl" />
+      <div className="absolute inset-20 flex items-center justify-center rounded-full bg-[#FFF8F0] text-[#FF8201] shadow-inner">
+        <GlobeHemisphereWest aria-hidden="true" size={150} weight="duotone" />
+      </div>
+      <div className="absolute left-0 top-20 flex items-center gap-2 rounded-2xl bg-white px-4 py-3 text-sm font-bold text-gray-800 shadow-xl">
+        <Microphone aria-hidden="true" className="text-orange-600" size={21} weight="duotone" />
+        Your voice
+      </div>
+      <div className="absolute bottom-16 right-0 flex items-center gap-2 rounded-2xl bg-gray-900 px-4 py-3 text-sm font-bold text-white shadow-xl">
+        <UsersThree aria-hidden="true" className="text-orange-300" size={21} weight="duotone" />
+        Our community
+      </div>
+      <div className="absolute right-8 top-4 h-12 w-12 rounded-full bg-purple-200" />
+      <div className="absolute bottom-8 left-10 h-8 w-8 rounded-full bg-orange-300" />
+    </div>
+  );
+}
+
 export default function AboutPage() {
   return (
-    <>
-      {/* Full-bleed hero photograph with headline */}
-      <section className="relative flex min-h-[62vh] items-end overflow-hidden">
-        <Image
-          src={aboutHero}
-          alt="A busy Lagos street with a yellow danfo bus and skaters holding on"
-          priority
-          fill
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-night/90 via-night/30 to-transparent"
-        />
-        <div className="relative mx-auto w-full max-w-6xl px-5 pb-14 pt-40 md:px-8 md:pb-20">
-          <Reveal>
-            <h1 className="max-w-[16ch] text-4xl font-extrabold leading-[1.05] tracking-tight text-white md:text-6xl">
-              We keep African languages loud.
+    <div className="bg-[#F5F1E8] text-gray-800">
+      <section className="relative overflow-hidden px-6 pb-20 pt-32 lg:px-8 lg:pb-28">
+        <div className="absolute left-0 top-24 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2">
+          <div className="max-w-2xl">
+            <p className="text-sm font-bold uppercase tracking-[0.24em] text-[#FF8201]">
+              About LinguaLink
+            </p>
+            <h1 className="mt-5 max-w-xl text-5xl font-black leading-[0.98] tracking-[-0.05em] text-gray-900 sm:text-6xl">
+              Language belongs in the future.
             </h1>
-          </Reveal>
+            <p className="mt-7 max-w-xl text-lg leading-relaxed text-gray-600 sm:text-xl">
+              LinguaLink helps people record, protect, and grow the languages technology has overlooked.
+            </p>
+            <a
+              href={appUrl + "/sign-up"}
+              className="mt-9 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#FF8201] to-[#FF6B00] px-7 py-4 font-bold text-white shadow-xl shadow-orange-200 transition hover:-translate-y-0.5 hover:shadow-2xl"
+            >
+              Get Started
+              <ArrowRight aria-hidden="true" size={19} weight="bold" />
+            </a>
+          </div>
+          <AboutIllustration />
         </div>
       </section>
 
-      {/* The story, plain prose */}
-      <section>
-        <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
-          <div className="grid gap-12 md:grid-cols-12">
-            <Reveal className="md:col-span-5">
-              <h2 className="text-3xl font-extrabold leading-[1.1] tracking-tight md:text-4xl">
-                Why we built LinguaLink
-              </h2>
-            </Reveal>
-            <div className="space-y-6 text-[17px] leading-relaxed text-ink-soft md:col-span-6 md:col-start-7">
-              <Reveal>
-                <p>
-                  Africa is home to about 2,000 languages. Yet when you talk to
-                  a phone, a bank line or a voice assistant, almost none of
-                  them work. The technology was never taught to listen.
-                </p>
-              </Reveal>
-              <Reveal delay={0.05}>
-                <p>
-                  LinguaLink started in Nigeria with a simple idea: the people
-                  who speak these languages every day are the experts. Give
-                  them a simple tool, pay them fairly, and together we can
-                  build the voice collections these languages need.
-                </p>
-              </Reveal>
-              <Reveal delay={0.1}>
-                <p>
-                  Today our community records and checks thousands of clips in
-                  Yoruba, Igbo and Hausa, with more languages on the way. Every
-                  clip is checked by fellow speakers, so the collection stays
-                  true to how people really talk.
-                </p>
-              </Reveal>
+      <section className="bg-white px-6 py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.24em] text-[#FF8201]">Our Story</p>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-gray-900 sm:text-5xl">
+              Built to listen.
+            </h2>
+          </div>
+          <div className="space-y-5 text-lg leading-relaxed text-gray-600">
+            <p>
+              Africa is home to thousands of languages, but most digital products were never taught to understand them.
+            </p>
+            <p>
+              We started LinguaLink in Nigeria with a simple belief: the people who speak a language every day are the experts. Give them a useful tool, treat their contributions with respect, and better technology can follow.
+            </p>
+            <p>
+              Today, LinguaLink brings recording, community review, communication, and rewards into one place.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#F5F1E8] px-6 py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="max-w-2xl">
+            <p className="text-sm font-bold uppercase tracking-[0.24em] text-[#FF8201]">What We Believe</p>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-gray-900 sm:text-5xl">
+              The work starts with people.
+            </h2>
+          </div>
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
+            {principles.map((principle) => {
+              const Icon = principle.icon;
+              return (
+                <article key={principle.title} className="rounded-3xl border border-orange-100 bg-white p-7 shadow-sm">
+                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${principle.tone}`}>
+                    <Icon aria-hidden="true" size={28} weight="duotone" />
+                  </div>
+                  <h3 className="mt-7 text-xl font-black text-gray-900">{principle.title}</h3>
+                  <p className="mt-3 leading-relaxed text-gray-600">{principle.text}</p>
+                </article>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white px-6 py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.24em] text-[#FF8201]">Our Mission</p>
+            <h2 className="mt-4 text-4xl font-black tracking-tight text-gray-900 sm:text-5xl">
+              Make every language count.
+            </h2>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-gray-600">
+              We are building the voice infrastructure that lets communities shape how technology understands them.
+            </p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {commitments.map((commitment) => (
+                <div key={commitment} className="flex items-start gap-3 text-sm font-semibold text-gray-700">
+                  <CheckCircle aria-hidden="true" className="mt-0.5 shrink-0 text-orange-500" size={20} weight="fill" />
+                  {commitment}
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Beliefs: numbered sequence with a reason to be numbered removed; plain trio */}
-      <section className="border-y border-line bg-tint">
-        <div className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-24">
-          <Reveal>
-            <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
-              What guides us
-            </h2>
-          </Reveal>
-          <div className="mt-12 grid gap-10 md:grid-cols-12">
-            {beliefs.map((belief, i) => (
-              <Reveal
-                key={belief.title}
-                delay={i * 0.08}
-                className={
-                  i === 0
-                    ? "md:col-span-4"
-                    : i === 1
-                      ? "md:col-span-4 md:mt-12"
-                      : "md:col-span-4 md:mt-24"
-                }
-              >
-                <div className="border-t-2 border-brand pt-5">
-                  <h3 className="text-xl font-bold tracking-tight">
-                    {belief.title}
-                  </h3>
-                  <p className="mt-3 text-[16px] leading-relaxed text-ink-soft">
-                    {belief.text}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
+          <div className="rounded-[2rem] bg-gray-900 p-8 text-white shadow-xl sm:p-10">
+            <p className="text-sm font-bold uppercase tracking-[0.24em] text-orange-300">Data Dignity</p>
+            <h3 className="mt-5 text-3xl font-black tracking-tight">Your voice stays yours.</h3>
+            <p className="mt-5 leading-relaxed text-white/70">
+              We keep privacy and clear ownership at the centre of every recording, review, and reward.
+            </p>
+            <a href="/privacy" className="mt-8 inline-flex items-center gap-2 font-bold text-orange-300 transition hover:text-white">
+              Read our privacy policy
+              <ArrowRight aria-hidden="true" size={17} weight="bold" />
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Data dignity split */}
-      <section>
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 md:grid-cols-2 md:px-8 md:py-28">
-          <Reveal>
-            <h2 className="text-3xl font-extrabold leading-[1.1] tracking-tight md:text-4xl">
-              Your voice stays yours.
-            </h2>
-            <p className="mt-5 max-w-[46ch] text-[17px] leading-relaxed text-ink-soft">
-              We separate your recordings from your personal details. We never
-              sell your contact information, and we never let anyone use your
-              clips to copy your voice. If our rules ever change, you hear it
-              from us first, inside the app.
-            </p>
-            <p className="mt-4 max-w-[46ch] text-[17px] leading-relaxed text-ink-soft">
-              We wrote our privacy policy in plain language, because a policy
-              you cannot read is not really a policy.
-            </p>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <Image
-              src={aboutPeople}
-              alt="A family playing a board game together at home"
-              sizes="(min-width: 768px) 520px, 90vw"
-              className="rounded-card object-cover"
-            />
-          </Reveal>
+      <section className="bg-gradient-to-br from-[#FF8201] to-[#FF6B00] px-6 py-20 text-center text-white lg:px-8">
+        <div className="mx-auto max-w-3xl">
+          <p className="text-sm font-bold uppercase tracking-[0.24em] text-white/75">Join the community</p>
+          <h2 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">Start with one phrase.</h2>
+          <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/85">
+            Help keep your language in the conversation.
+          </p>
+          <a href={appUrl + "/sign-up"} className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-7 py-4 font-bold text-orange-600 shadow-xl transition hover:-translate-y-0.5">
+            Get Started
+            <ArrowRight aria-hidden="true" size={18} weight="bold" />
+          </a>
         </div>
       </section>
-
-      <DarkCta />
-    </>
+    </div>
   );
 }
